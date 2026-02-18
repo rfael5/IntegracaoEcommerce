@@ -22,17 +22,17 @@ public class AppDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        // var connectionString=$"Server={Environment.GetEnvironmentVariable("DB_HOST_SERVER")};" +
-        //                      $"User Id={Environment.GetEnvironmentVariable("DB_USER")};" +
-        //                      $"Password={Environment.GetEnvironmentVariable("DB_PASSWORD_SERVER")};" +  
-        //                      $"Database={Environment.GetEnvironmentVariable("DB_NAME")};" +
-        //                      "TrustServerCertificate=True;";
+        var connectionString=$"Server={Environment.GetEnvironmentVariable("DB_HOST_SERVER")};" +
+                             $"User Id={Environment.GetEnvironmentVariable("DB_USER")};" +
+                             $"Password={Environment.GetEnvironmentVariable("DB_PASSWORD_SERVER")};" +  
+                             $"Database={Environment.GetEnvironmentVariable("DB_NAME")};" +
+                             "TrustServerCertificate=True;";
 
-        var connectionString=$"Server=localhost;" +
-                              $"User Id='Sa';" +
-                              $"Password='P@ssw0rd2023';" +  
-                              $"Database='SOUTTOMAYOR';" +
-                              "TrustServerCertificate=True;";
+        // var connectionString=$"Server=localhost;" +
+        //                       $"User Id='Sa';" +
+        //                       $"Password='P@ssw0rd2023';" +  
+        //                       $"Database='SOUTTOMAYOR';" +
+        //                       "TrustServerCertificate=True;";
 
         optionsBuilder.UseSqlServer(connectionString);  
     }
