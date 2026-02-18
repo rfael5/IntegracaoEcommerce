@@ -26,10 +26,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
-//app.MapGet("/codigo-usuario", async () => { await UsuariosTPA.CriarCodigoCliente();});
-
-// app.UseHttpsRedirection();
-// app.UseAuthorization();
 app.MapControllers();
 app.UseCors("All");
 app.Run();
