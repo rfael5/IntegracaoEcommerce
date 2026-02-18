@@ -3,7 +3,7 @@ WORKDIR /app
 EXPOSE 5227
 ENV ASPNETCORE_URLS=http://+:5227
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
-RUN apk add --no-cache icu-libs
+RUN apk add --no-cache icu-libs tzdata
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS build
 WORKDIR /src
