@@ -14,12 +14,18 @@ public class UserController:ControllerBase
     private readonly AcessoTPA _acessoTpa;
     private readonly UsuariosTPA _usuariosTpa;
     private readonly AcessoEcommerce _acessoEcommerce;
+    private readonly CadastroOR _cadastroOr;
 
-    public UserController(AcessoTPA acessoTpa, UsuariosTPA usuariosTpa, AcessoEcommerce acessoEcommerce)
+    public UserController(
+        AcessoTPA acessoTpa, 
+        UsuariosTPA usuariosTpa, 
+        AcessoEcommerce acessoEcommerce,
+        CadastroOR cadastroOr)
     {
         _acessoTpa = acessoTpa;
         _usuariosTpa = usuariosTpa;
         _acessoEcommerce = acessoEcommerce;
+        _cadastroOr = cadastroOr;
     }
 
     [EnableCors("All")]
@@ -42,6 +48,20 @@ public class UserController:ControllerBase
     {
         var result = await _acessoTpa.GetMovtoped();
         return Ok(result);
+    }
+
+    [HttpPost("criar-or")]
+    public async Task<IActionResult> CriarOr([FromBody] InformacoesOR informacoesOr)
+    {
+        var result = await _cadastroOr.CadastrarNovaOr(informacoesOr);
+        return Ok(new {message = result});
+    }
+
+    [HttpPost("criar-ec")]
+    public async Task<IActionResult> CriarEc([FromBody] InformacoesOR informacoesOr, DoctopedFpAtendimento doctopedFpAtendimento)
+    {
+        var result = await _cadastroOr.CadastrarNovaEC(informacoesOr, doctopedFpAtendimento);
+        return Ok(new {message = result});
     }
     
 }

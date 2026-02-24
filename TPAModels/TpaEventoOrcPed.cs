@@ -31,7 +31,7 @@ public record TpaEventoOrcPedDTO
     public decimal valorItens { get; init; }
 
     [Column("TPDESCONTO")]
-    public required string tpDesconto { get; init; }
+    public string tpDesconto { get; init; } = "";
 
     [Column("DESCONTO")]
     public decimal desconto { get; init; }
@@ -64,7 +64,7 @@ public record TpaEventoOrcPedDTO
     public int qtPropConvidados { get; init; }
 
     [Column("QTPROPARREDONDAR")]
-    public required string qtPropArredondar { get; init; }
+    public string qtPropArredondar { get; init; } = "S";
 
     [Column("IDX_EVENTOTPSV")]
     public required string idxEventoTpSv { get; init; }
@@ -106,16 +106,16 @@ public record TpaEventoOrcPedDTO
     public decimal valorConvidado { get; init; }
 
     [Column("OPVALOR")]
-    public required string opValor { get; init; }
+    public string opValor { get; init; } = "N";
 
     [Column("IDX_IMG")]
     public required string idxImg { get; init; }
 
     [Column("CORTESIA")]
-    public required string cortesia { get; init; }
+    public string cortesia { get; init; } = "N";
 
     [Column("TPIMPRESSAOTAB")]
-    public required string tpImpressaoTab { get; init; }
+    public string tpImpressaoTab { get; init; } = "N";
 
     [Column("INCIDEIMPOSTOS")]
     public string? incideImpostos { get; init; }

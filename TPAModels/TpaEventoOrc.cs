@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-[Table("TPACEVENTOORC", Schema = "dbo")]
+[Table("TPAEVENTOORC", Schema = "dbo")]
 public record TpaEventoOrcDTO
 {
     [Key]
@@ -16,22 +16,22 @@ public record TpaEventoOrcDTO
     public string? descricao { get; init; }
 
     [Column("CODIGO")]
-    public required string codigo { get; init; }
+    public string? codigo { get; init; } = "";
 
     [Column("IDX_EVENTO")]
     public required string idxEvento { get; init; }
 
     [Column("CONTATO")]
-    public required string contato { get; init; }
+    public string? contato { get; init; } = "";
 
     [Column("CONTATOTEL")]
-    public required string contatoTel { get; init; }
+    public string contatoTel { get; init; } = "";
 
     [Column("CONTATOEMAIL1")]
-    public required string contatoEmail1 { get; init; }
+    public string contatoEmail1 { get; init; } = "";
 
     [Column("CONTATOEMAIL2")]
-    public required string contatoEmail2 { get; init; }
+    public string contatoEmail2 { get; init; } = "";
 
     [Column("CONVIDADOS")]
     public int convidados { get; init; }
@@ -67,7 +67,7 @@ public record TpaEventoOrcDTO
     public string? textoProducao { get; init; }
 
     [Column("IDX_CASAEVENTO")]
-    public required string idxCasaEvento { get; init; }
+    public string idxCasaEvento { get; init; } = "";
 
     [Column("IDX_ENDERECO")]
     public required string idxEndereco { get; init; }
@@ -76,19 +76,19 @@ public record TpaEventoOrcDTO
     public string? local { get; init; }
 
     [Column("STATUS")]
-    public required string status { get; init; }
+    public string status { get; init; } = "A";
 
     [Column("IDX_CLIENTE")]
-    public required string idxCliente { get; init; }
+    public string idxCliente { get; init; } = "";
 
     [Column("IDX_RESPONSAVEL")]
-    public required string idxResponsavel { get; init; }
+    public string idxResponsavel { get; init; } = "";
 
     [Column("IDX_PARCERIA")]
-    public required string idxParceria { get; init; }
+    public string idxParceria { get; init; } = "";
 
     [Column("MOTIVOSTATUS")]
-    public required string motivoStatus { get; init; }
+    public string motivoStatus { get; init; } = "";
 
     [Column("DTINC")]
     public DateTime dtInc { get; init; }
@@ -115,88 +115,88 @@ public record TpaEventoOrcDTO
     public string? textoExecucao { get; init; }
 
     [Column("OBSSAIDA")]
-    public required string obsSaida { get; init; }
+    public string obsSaida { get; init; } = "";
 
     [Column("OBSRETORNO")]
-    public required string obsRetorno { get; init; }
+    public string obsRetorno { get; init; } = "";
 
     [Column("HSSAIDA")]
-    public required string hsSaida { get; init; }
+    public string hsSaida { get; init; } = "";
 
     [Column("HSRETORNO")]
-    public required string hsRetorno { get; init; }
+    public string hsRetorno { get; init; } = "";
 
     [Column("ALT")]
-    public int alt { get; init; }
+    public int alt { get; init; } = 0;
 
     [Column("SIT1")]
-    public required string sit1 { get; init; }
+    public string sit1 { get; init; } = "";
 
     [Column("SIT2")]
-    public required string sit2 { get; init; }
+    public string sit2 { get; init; } = "";
 
     [Column("SEQUENCIA")]
-    public int sequencia { get; init; }
+    public int sequencia { get; init; } = 0;
 
     [Column("SIT3")]
-    public required string sit3 { get; init; }
+    public string sit3 { get; init; } = "";
 
     [Column("ASSOCIAMATERIAL")]
-    public required string associaMaterial { get; init; }
+    public string associaMaterial { get; init; } = "";
 
     [Column("OPCOMPRA")]
-    public required string opCompra { get; init; }
+    public string opCompra { get; init; } = "";
 
     [Column("ATIVIDADE")]
-    public required string atividade { get; init; }
+    public string atividade { get; init; } = "";
 
     [Column("TPLOCAL")]
-    public required string tpLocal { get; init; }
+    public string tpLocal { get; init; } = "";
 
     [Column("CALCULOEXECUTADO")]
-    public required string calculoExecutado { get; init; }
+    public string calculoExecutado { get; init; } = "";
 
     [Column("IDX_DOCTORELOC")]
-    public int? idxDoctorEloc { get; init; }
+    public int? idxDoctorEloc { get; init; } = 0;
 
     [Column("OBSDESPESA")]
-    public required string obsDespesa { get; init; }
+    public string obsDespesa { get; init; } = "";
 
     [Column("FINALIZAEXECUCAO")]
-    public required string finalizaExecucao { get; init; }
+    public string finalizaExecucao { get; init; } = "P";
 
     [Column("FINALIZAESCALA")]
-    public required string finalizaEscala { get; init; }
+    public string finalizaEscala { get; init; } = "P";
 
     [Column("FINALIZACONSUMOADICIONAL")]
-    public required string finalizaConsumoAdicional { get; init; }
+    public string finalizaConsumoAdicional { get; init; } = "P";
 
     [Column("FINALIZARETORNO")]
-    public required string finalizaRetorno { get; init; }
+    public string finalizaRetorno { get; init; } = "P";
 
     [Column("FINALIZADESPESAEXTRA")]
-    public required string finalizaDespesaExtra { get; init; }
+    public string finalizaDespesaExtra { get; init; } = "P";
 
     [Column("FINALIZAQUESTIONARIO")]
-    public required string finalizaQuestionario { get; init; }
+    public string finalizaQuestionario { get; init; } = "P";
 
     [Column("IDX_QUESTIONARIOFINAL")]
-    public required string idxQuestionarioFinal { get; init; }
+    public string idxQuestionarioFinal { get; init; } = "";
 
     [Column("IDX_ESPACOFISICO")]
-    public required string idxEspacoFisico { get; init; }
+    public string idxEspacoFisico { get; init; } = "";
 
     [Column("TPCALCCORRECAO")]
-    public required string tpCalcCorrecao { get; init; }
+    public string tpCalcCorrecao { get; init; } = "N";
 
     [Column("CALCCORRECAO")]
-    public decimal calcCorrecao { get; init; }
+    public decimal calcCorrecao { get; init; } = 0;
 
     [Column("FRETEDEVIDO")]
-    public decimal freteDevido { get; init; }
+    public decimal freteDevido { get; init; } = 0;
 
     [Column("SITUACAOLOCACAO")]
-    public required string situacaoLocacao { get; init; }
+    public string situacaoLocacao { get; init; } = "";
 
     [Column("CUSTOOPERACIONAL")]
     public decimal custoOperacional { get; init; }
