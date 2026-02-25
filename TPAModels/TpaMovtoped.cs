@@ -14,7 +14,7 @@ public record TpaMovtopedDTO
     [Column("SINAL")]
     public string sinal { get; init; } = "-";
     [Column("DATA")]
-    public DateTimeOffset data { get; init; } = BrazilTime.NowOffset();
+    public DateTime data { get; init; } = BrazilTime.Now();
     [Column("IDX_DEPTO")]
     public string? idxDepto { get; init; } = "          10";
     [Column("ITEM")]
@@ -102,7 +102,7 @@ public record TpaMovtopedDTO
     [Column("PESO")] 
     public decimal peso { get; init; }
     [Column("DTVALIDADE")] 
-    public DateTimeOffset? dtValidade { get; init; } = BrazilTime.NowOffset();
+    public DateTime? dtValidade { get; init; } = BrazilTime.Now();
     [Column("SITUACAO")] 
     public string situacao { get; init; } = "Z"; //CONFIRMAR
     [Column("ESTOQUE")] 
@@ -120,9 +120,9 @@ public record TpaMovtopedDTO
     [Column("LOCACAO")] 
     public string locacao { get; init; } = "N"; //PODE VARIAR
     [Column("DTSAIDA")] 
-    public DateTimeOffset dtSaida { get; init; } = BrazilTime.NowOffset();
+    public DateTime dtSaida { get; init; } = BrazilTime.Now();
     [Column("DTRETORNO")] 
-    public DateTimeOffset dtRetorno { get; init; } = BrazilTime.NowOffset();
+    public DateTime dtRetorno { get; init; } = BrazilTime.Now();
     [Column("STATUSLOCACAO")] 
     public string statusLocacao { get; init; } = "N";
     [Column("PERIODOLOCACAO")] 
@@ -130,11 +130,11 @@ public record TpaMovtopedDTO
     [Column("TPPERIODOLOCACAO")] 
     public string tpPeriodoLocacao { get; init; } = "D";
     [Column("DTINC")] 
-    public DateTimeOffset dtInc { get; init; }
+    public DateTime dtInc { get; init; } = BrazilTime.Now();
     [Column("OPINC")] 
     public int opInc { get; init; } //ENVIAR DO FRONT;
     [Column("DTALT")] 
-    public DateTimeOffset dtAlt { get; init; }
+    public DateTime dtAlt { get; init; } = BrazilTime.Now();
     [Column("OPALT")] 
     public int opAlt { get; init; } //ENVIAR DO FRONT;
     [Column("L_CALCDESCONTO")] 

@@ -18,7 +18,7 @@ public record TpaDoctopedDTO
     [Column("DOCUMENTO")]
     public int? documento { get; init; }
     [Column("DATA")]
-    public DateTimeOffset data { get; init; } = BrazilTime.NowOffset();
+    public DateTime data { get; init; } = BrazilTime.Now();
     [Column("TPENTIDADE")]
     public string tpEntidade { get; init; } = "C";
     [Column("IDX_ENTIDADE")]
@@ -166,7 +166,7 @@ public record TpaDoctopedDTO
     [Column("SITUACAO")] 
     public string situacao { get; init; } = "Z";
     [Column("DTSITUACAO")] 
-    public DateTimeOffset dtSituacao { get; init; } = BrazilTime.NowOffset();
+    public DateTime dtSituacao { get; init; } = BrazilTime.Now();
     [Column("MOTIVOSITUACAO")] 
     public string motivoSituacao { get; init; } = "";
     [Column("VALORENTRADA")] 
@@ -194,11 +194,11 @@ public record TpaDoctopedDTO
     [Column("TEMST")] 
     public string temSt { get; init; } = "N";
     [Column("DTSAIDA")] 
-    public DateTimeOffset dtSaida { get; init; } = BrazilTime.NowOffset();
+    public DateTime dtSaida { get; init; } = BrazilTime.Now();
     [Column("DTEVENTO")] 
-    public DateTimeOffset dtEvento { get; init; } = BrazilTime.NowOffset();
+    public DateTime dtEvento { get; init; } = BrazilTime.Now();
     [Column("DTRETORNO")] 
-    public DateTimeOffset dtRetorno { get; init; } = BrazilTime.NowOffset();
+    public DateTime dtRetorno { get; init; } = BrazilTime.Now();
     [Column("PERIODOLOCACAO")] 
     public int periodoLocacao { get; init; } = 1;
     [Column("TPPERIODOLOCACAO")] 
@@ -220,11 +220,11 @@ public record TpaDoctopedDTO
     [Column("TOTALQTLOC")] 
     public decimal totalQtLoc { get; init; } = 0;
     [Column("DTINC")] 
-    public DateTimeOffset dtInc { get; init; } = BrazilTime.NowOffset();
+    public DateTime dtInc { get; init; } = BrazilTime.Now();
     [Column("OPINC")] 
     public int opInc { get; init; }
     [Column("DTALT")] 
-    public DateTimeOffset dtAlt{ get; init; } = BrazilTime.NowOffset();
+    public DateTime dtAlt{ get; init; } = BrazilTime.Now();
     [Column("OPALT")] 
     public int opAlt { get; init; }
     [Column("TPOPERACAO")] 
@@ -236,7 +236,7 @@ public record TpaDoctopedDTO
     [Column("IDX_ENDERECOENT")] 
     public string idxEnderecoEnt { get; init; } = "            ";
     [Column("IDX_ENDERECOOBRA")] 
-    public string idxEnderecoObra { get; init; }
+    public string idxEnderecoObra { get; init; } = "            ";
     [Column("IDX_ENDERECOCOB")] 
     public string idxEnderecoCob { get; init; } = "            ";
     [Column("IDX_ENDERECOFAT")] 
@@ -252,17 +252,17 @@ public record TpaDoctopedDTO
     [Column("NFNUMERO")] 
     public string nfNumero { get; init; } = "";
     [Column("NFDTEMISSAO")] 
-    public DateTimeOffset? nfDtEmissao { get; init; } = BrazilTime.NowOffset();
+    public DateTime? nfDtEmissao { get; init; } = BrazilTime.Now();
     [Column("NFDTSAIDA")] 
-    public DateTimeOffset? nfDtSaida { get; init; } = BrazilTime.NowOffset();
+    public DateTime? nfDtSaida { get; init; } = BrazilTime.Now();
     [Column("STCALC")]
     public string stCalc { get; init; } = "N";
     [Column("NFTPEMISSAO")]
     public string nftPermissao { get; init; } = " ";
     [Column("NFHORASAIDA")]
-    public string nfHoraSaida { get; init; }
+    public string nfHoraSaida { get; init; } = " ";
     [Column("IDX_DOCTOEVENTO")]
-    public string idxDoctoEvento { get; init; }
+    public string idxDoctoEvento { get; init; } = " ";
     [Column("MODULO")]
     public string? modulo { get; init; } = "BF";
     [Column("OPERACAOTIPO")]
@@ -278,7 +278,7 @@ public record TpaDoctopedDTO
     [Column("PARCIAL")]
     public string parcial { get; init; } = "N";
     [Column("IDX_DEPTOENT")]
-    public string idxDeptoEnt { get; init; }
+    public string idxDeptoEnt { get; init; } = "";
     [Column("NFEMITENTE")]
     public string nfEmitente { get; init; } = "E";
     [Column("TXTHISTORICO")]
@@ -288,13 +288,13 @@ public record TpaDoctopedDTO
     [Column("TXTOPCOES")]
     public string? txtOpcoes { get; init; } = null;
     [Column("DTABERTURA")]
-    public DateTimeOffset? dtAbertura { get; init; } = BrazilTime.NowOffset();
+    public DateTime? dtAbertura { get; init; } = BrazilTime.Now();
     [Column("DTFECHAMENTO")]
-    public DateTimeOffset? dtFechamento{ get; init; } = BrazilTime.NowOffset();
+    public DateTime? dtFechamento{ get; init; } = BrazilTime.Now();
     [Column("IDX_CADASTROEQPTO")]
     public string idxCadastroEqpto{ get; init; } = "";
     [Column("DTPREVISAO")]
-    public DateTimeOffset dtPrevisao { get; init; }
+    public DateTime dtPrevisao { get; init; }
     [Column("HORAPREVISAO")]
     public required string horaPrevisao { get; init; }
     [Column("HORAABERTURA")]
@@ -360,7 +360,7 @@ public record TpaDoctopedDTO
     [Column("ORIGEM")] 
     public string origem { get; init; } = "L";
     [Column("DTPREVISAOINI")] 
-    public DateTimeOffset? dtPrevisaoIni { get; init; } = BrazilTime.NowOffset(); 
+    public DateTime? dtPrevisaoIni { get; init; } = BrazilTime.Now(); 
     [Column("IDX_ORCAMENTO")] 
     public int idxOrcamento { get; init; } = 0;
     [Column("TOTALAJUSTE")] 

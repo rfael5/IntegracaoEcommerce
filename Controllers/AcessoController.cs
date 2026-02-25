@@ -14,13 +14,13 @@ public class UserController:ControllerBase
     private readonly AcessoTPA _acessoTpa;
     private readonly UsuariosTPA _usuariosTpa;
     private readonly AcessoEcommerce _acessoEcommerce;
-    private readonly CadastroOR _cadastroOr;
+    private readonly CadastroPedido _cadastroOr;
 
     public UserController(
         AcessoTPA acessoTpa, 
         UsuariosTPA usuariosTpa, 
         AcessoEcommerce acessoEcommerce,
-        CadastroOR cadastroOr)
+        CadastroPedido cadastroOr)
     {
         _acessoTpa = acessoTpa;
         _usuariosTpa = usuariosTpa;
@@ -58,9 +58,9 @@ public class UserController:ControllerBase
     }
 
     [HttpPost("criar-ec")]
-    public async Task<IActionResult> CriarEc([FromBody] InformacoesOR informacoesOr, DoctopedFpAtendimento doctopedFpAtendimento)
+    public async Task<IActionResult> CriarEc([FromBody] InformacoesOR informacoesOr)
     {
-        var result = await _cadastroOr.CadastrarNovaEC(informacoesOr, doctopedFpAtendimento);
+        var result = await _cadastroOr.CadastrarNovaEC(informacoesOr);
         return Ok(new {message = result});
     }
     

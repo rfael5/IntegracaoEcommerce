@@ -28,7 +28,7 @@ public class AppDbContext : DbContext
         //                      $"Database={Environment.GetEnvironmentVariable("DB_NAME")};" +
         //                      "TrustServerCertificate=True;";
 
-        var connectionString=$"Server=localhost;" +
+        var connectionString=$"Server=192.168.1.55;" +
                               $"User Id='Sa';" +
                               $"Password='P@ssw0rd2023';" +  
                               $"Database='SOUTTOMAYOR';" +
@@ -58,5 +58,9 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<TpaCadastroDTO>().ToTable(tb => tb.UseSqlOutputClause(false));
         modelBuilder.Entity<TpaEnderecoDTO>().ToTable(tb => tb.UseSqlOutputClause(false));
         modelBuilder.Entity<TpaContatoDTO>().ToTable(tb => tb.UseSqlOutputClause(false));
+        modelBuilder.Entity<TpaEventoOrcDTO>().ToTable(tb => tb.UseSqlOutputClause(false));
+        modelBuilder.Entity<TpaEventoOrcPedDTO>().ToTable(tb => tb.UseSqlOutputClause(false));
     }
+
+    
 }

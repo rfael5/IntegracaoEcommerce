@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-[Table("TPACEVENTOORCPED", Schema = "dbo")]
+[Table("TPAEVENTOORCPED", Schema = "dbo")]
 public record TpaEventoOrcPedDTO
 {
     [Key]
@@ -46,13 +46,13 @@ public record TpaEventoOrcPedDTO
     public decimal despesas { get; init; }
 
     [Column("DTINC")]
-    public DateTime dtInc { get; init; }
+    public DateTime dtInc { get; init; } = BrazilTime.Now();
 
     [Column("OPINC")]
     public int opInc { get; init; }
 
     [Column("DTALT")]
-    public DateTime dtAlt { get; init; }
+    public DateTime dtAlt { get; init; } = BrazilTime.Now();
 
     [Column("OPALT")]
     public int opAlt { get; init; }

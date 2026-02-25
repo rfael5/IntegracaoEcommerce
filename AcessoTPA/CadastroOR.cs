@@ -4,13 +4,13 @@ using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
-public class CadastroOR
+public class CadastroPedido
 {
     private readonly AppDbContext _context;
     private UsuariosTPA _usuariosService;
     private AcessoTPA _acessoTpa;
 
-    public CadastroOR(AppDbContext context, UsuariosTPA usuariosService, AcessoTPA acessoTpa)
+    public CadastroPedido(AppDbContext context, UsuariosTPA usuariosService, AcessoTPA acessoTpa)
     {
         _context = context;
         _usuariosService = usuariosService;
@@ -33,8 +33,8 @@ public class CadastroOR
         .FirstAsync();
         var ultimoIdMaisUm = ultimoId + 1;
         //var teste = "       50526";
-        var novoPkEventoOrc = $"       {ultimoIdMaisUm}";
-        return novoPkEventoOrc;
+        //var novoPkEventoOrc = $"       {ultimoIdMaisUm}";
+        return ultimoIdMaisUm.ToString().PadLeft(12);
     }
 
     public async Task<string> CriarPkOrcPed()
@@ -45,13 +45,15 @@ public class CadastroOR
         .FirstAsync();
         var ultimoIdMaisUm = ultimoId + 1;
         //var teste = "       50526";
-        var novoPkOrcPed = $"       {ultimoIdMaisUm}";
-        return novoPkOrcPed;
+        //var novoPkOrcPed = $"       {ultimoIdMaisUm}";
+        
+        return ultimoIdMaisUm.ToString().PadLeft(12);
     }
 
     public async Task<InformacoesProdutoTPA> GetDadosProduto(string _pkProduto)
     {
-        var result = await _context.Produto.Where(produto => produto.pkProduto.Trim() == _pkProduto).SingleOrDefaultAsync();
+        Console.WriteLine(_pkProduto);
+        var result = await _context.Produto.Where(produto => produto.pkProduto.Trim() == _pkProduto.Trim()).SingleOrDefaultAsync();
         if(result == null)
         {
             throw new InvalidOperationException("Produto não encontrado no banco de dados");
@@ -253,7 +255,7 @@ public class CadastroOR
         }
     }
 
-    public async Task<string> CadastrarNovaEC(InformacoesOR informacoesOr, DoctopedFpAtendimento doctopedFP)
+    public async Task<string> CadastrarNovaEC(InformacoesOR informacoesOr)
     {
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
@@ -264,7 +266,7 @@ public class CadastroOR
                 var movtoped = await CadastrarMovtopedOR(produto, doctoped.pkDoctoped);
                 _context.Movtoped.Add(movtoped);
             }
-            await CadastrarDoctopedFP(doctoped.pkDoctoped, informacoesOr.doctopedAtendimento, doctopedFP);
+            await CadastrarDoctopedFP(doctoped.pkDoctoped, informacoesOr.doctopedAtendimento, informacoesOr.doctopedFpAtendimento);
 
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();

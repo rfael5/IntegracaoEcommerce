@@ -91,13 +91,13 @@ public record TpaEventoOrcDTO
     public string motivoStatus { get; init; } = "";
 
     [Column("DTINC")]
-    public DateTime dtInc { get; init; }
+    public DateTime dtInc { get; init; } = BrazilTime.Now();
 
     [Column("OPINC")]
     public int opInc { get; init; }
 
     [Column("DTALT")]
-    public DateTime dtAlt { get; init; }
+    public DateTime dtAlt { get; init; } = BrazilTime.Now();
 
     [Column("OPALT")]
     public int opAlt { get; init; }

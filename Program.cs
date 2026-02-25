@@ -19,6 +19,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<AcessoEcommerce>();
 builder.Services.AddScoped<AcessoTPA>();
 builder.Services.AddScoped<UsuariosTPA>();
+builder.Services.AddScoped<CadastroPedido>();
 builder.Services.AddControllers();
 
 builder.Services.AddDbContext<AppDbContext>(options => 

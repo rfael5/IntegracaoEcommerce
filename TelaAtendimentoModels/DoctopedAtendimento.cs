@@ -54,7 +54,7 @@ public record DoctopedAtendimento
     [Column("TEMLOCACAO")] 
     public string temLocacao { get; init; } // Se possui produto, serviço ou materiais no evento. Valor S ou N.
     [Column("DTEVENTO")] 
-    public DateTimeOffset dtEvento { get; init; } // Data do evento
+    public DateTime dtEvento { get; init; } // Data do evento
     [Column("TOTALITENSPROD")] 
     public int totalItensProd { get; init; } // Quantidade de produtos receita
     [Column("TOTALITENSSERV")] 
@@ -76,7 +76,7 @@ public record DoctopedAtendimento
     [Column("EMAIL")]
     public string email { get; init; } // Dados de contato do cliente - email
     [Column("DTPREVISAO")]
-    public DateTimeOffset dtPrevisao { get; init; } // Data entrega encomenda
+    public DateTime dtPrevisao { get; init; } // Data entrega encomenda
     [Column("HORAPREVISAO")]
     public required string horaPrevisao { get; init; } // Horario entrega encomenda
     [Column("CELULAR")]

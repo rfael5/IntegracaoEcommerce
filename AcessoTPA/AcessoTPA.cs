@@ -57,8 +57,8 @@ public class AcessoTPA
             prodTotal = totalPedido,
             freteValor = 100,
             despDivValor = 0,
-            dtSaida = BrazilTime.NowOffset(),
-            dtEvento = BrazilTime.NowOffset(),
+            dtSaida = BrazilTime.Now(),
+            dtEvento = BrazilTime.Now(),
             totalItensProd = dadosPedido.produtos.Count,
             totalQtProd = dadosPedido.produtos.Count,
             opInc = 436,
@@ -70,7 +70,7 @@ public class AcessoTPA
             nfHoraSaida = "",
             idxDoctoEvento = dadosPedido.idPedido.ToString(),
             idxDeptoEnt = "",
-            dtPrevisao = BrazilTime.NowOffset(),
+            dtPrevisao = BrazilTime.Now(),
             horaPrevisao = "",
             dtPrevisaoIni = null,
             totalFinanceiro = totalPedido
@@ -103,9 +103,9 @@ public class AcessoTPA
             e_precomedio = dadosProdutoTpa.pcMedio,
             e_quantidade = produto.quantidade * -1,
             peso = dadosProdutoTpa.peso,
-            dtInc = BrazilTime.NowOffset(),
+            dtInc = BrazilTime.Now(),
             opInc = 436,
-            dtAlt = BrazilTime.NowOffset(),
+            dtAlt = BrazilTime.Now(),
             opAlt = 436,
             ncm = dadosProdutoTpa.ncm
         };
