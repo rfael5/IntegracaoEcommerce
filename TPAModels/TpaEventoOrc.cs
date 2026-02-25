@@ -148,7 +148,7 @@ public record TpaEventoOrcDTO
     public string opCompra { get; init; } = "";
 
     [Column("ATIVIDADE")]
-    public string atividade { get; init; } = "";
+    public string atividade { get; init; } = "N";
 
     [Column("TPLOCAL")]
     public string tpLocal { get; init; } = "";

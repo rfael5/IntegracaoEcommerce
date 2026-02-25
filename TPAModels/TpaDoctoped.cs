@@ -288,9 +288,9 @@ public record TpaDoctopedDTO
     [Column("TXTOPCOES")]
     public string? txtOpcoes { get; init; } = null;
     [Column("DTABERTURA")]
-    public DateTime? dtAbertura { get; init; } = BrazilTime.Now();
+    public DateTime? dtAbertura { get; init; } 
     [Column("DTFECHAMENTO")]
-    public DateTime? dtFechamento{ get; init; } = BrazilTime.Now();
+    public DateTime? dtFechamento{ get; init; } 
     [Column("IDX_CADASTROEQPTO")]
     public string idxCadastroEqpto{ get; init; } = "";
     [Column("DTPREVISAO")]
