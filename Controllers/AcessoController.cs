@@ -59,38 +59,40 @@ public class UserController:ControllerBase
     }
 
     [HttpPost("criar-or")]
-    public async Task<ResponseData> CriarOr([FromBody] InformacoesOR informacoesOr)
+    public async Task<IActionResult> CriarOr([FromBody] InformacoesOR informacoesOr)
     {
         try
         {
             var result = await _cadastroOr.CadastrarNovaOr(informacoesOr);
-            var message = new ResponseData
+
+            return Ok(new ResponseData
             {
                 status = 200,
                 message = "OK",
                 data = result
-            };
-            return message;
+            });
         }
-        catch(HttpRequestException e )
+        catch (HttpRequestException e)
         {
             Console.WriteLine(e);
-            var message = new ResponseData
-            {
-                status = Convert.ToInt32(e.StatusCode),
-                message = e.Message
-            };
-            return message;
+
+            return StatusCode(
+                (int?)e.StatusCode ?? 500,
+                new ResponseData
+                {
+                    status = (int?)e.StatusCode ?? 500,
+                    message = e.Message
+                });
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Console.WriteLine(e);
-            var message = new ResponseData
+
+            return StatusCode(500, new ResponseData
             {
                 status = 500,
-                message = e.Message
-            };
-            return message;
+                message = e.InnerException?.Message ?? e.Message
+            });
         }
     }
 
