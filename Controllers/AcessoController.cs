@@ -28,6 +28,13 @@ public class UserController:ControllerBase
         _cadastroOr = cadastroOr;
     }
 
+    public record ResponseData
+    {
+        public int status { get; set; }
+        public string message { get; set; }
+        public object? data { get; set; } = null;
+    }
+
     [EnableCors("All")]
     [HttpGet("codigo-usuario")]
     public async Task<IActionResult> Teste()
@@ -51,17 +58,76 @@ public class UserController:ControllerBase
     }
 
     [HttpPost("criar-or")]
-    public async Task<IActionResult> CriarOr([FromBody] InformacoesOR informacoesOr)
+    public async Task<ResponseData> CriarOr([FromBody] InformacoesOR informacoesOr)
     {
-        var result = await _cadastroOr.CadastrarNovaOr(informacoesOr);
-        return Ok(new {message = result});
+        try
+        {
+            var result = await _cadastroOr.CadastrarNovaOr(informacoesOr);
+            var message = new ResponseData
+            {
+                status = 200,
+                message = "OK",
+                data = result
+            };
+            return message;
+        }
+        catch(HttpRequestException e )
+        {
+            Console.WriteLine(e);
+            var message = new ResponseData
+            {
+                status = Convert.ToInt32(e.StatusCode),
+                message = e.Message
+            };
+            return message;
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e);
+            var message = new ResponseData
+            {
+                status = 500,
+                message = e.Message
+            };
+            return message;
+        }
     }
 
     [HttpPost("criar-ec")]
-    public async Task<IActionResult> CriarEc([FromBody] InformacoesOR informacoesOr)
+    public async Task<ResponseData> CriarEc([FromBody] InformacoesOR informacoesOr)
     {
-        var result = await _cadastroOr.CadastrarNovaEC(informacoesOr);
-        return Ok(new {message = result});
+        try
+        {
+            var result = await _cadastroOr.CadastrarNovaEC(informacoesOr);
+            Console.WriteLine(result);
+            var message = new ResponseData
+            {
+                status = 200,
+                message = "OK",
+                data = result
+            };
+            return message;
+        }
+        catch(HttpRequestException e)
+        {
+            Console.WriteLine(e);
+            var message = new ResponseData
+            {
+                status = Convert.ToInt32(e.StatusCode),
+                message = e.Message
+            };
+            return message;
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e);
+            var message = new ResponseData
+            {
+                status = 500,
+                message = e.Message               
+            };
+            return message;
+        }
     }
     
 }
