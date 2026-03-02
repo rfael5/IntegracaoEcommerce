@@ -28,5 +28,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 var app = builder.Build();
 
 app.MapControllers();
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseCors("All");
 app.Run();

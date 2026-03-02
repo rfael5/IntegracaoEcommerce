@@ -8,6 +8,7 @@ using System.Text;
 
 
 [ApiController]
+[ApiKey]
 [Route("user")]
 public class UserController:ControllerBase
 {
