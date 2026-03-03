@@ -166,7 +166,7 @@ public class CadastroPedido
         return novaOR;
     }
 
-    public async Task<TpaMovtopedDTO> CadastrarMovtopedOR(MovtopedAtendimento movtoped, int _rdxDoctoped)
+    public async Task<TpaMovtopedDTO> CadastrarMovtopedOR(MovtopedAtendimento movtoped, int _rdxDoctoped, TpaEventoOrcPedDTO orcPed)
     {
         var dadosProduto = await GetDadosProduto(movtoped.idxProduto);
         Console.WriteLine(JsonSerializer.Serialize(dadosProduto));
@@ -188,20 +188,22 @@ public class CadastroPedido
             situacao = movtoped.situacao,
             opInc = movtoped.opInc,
             opAlt = movtoped.opAlt,
-            ncm = movtoped.ncm
+            ncm = movtoped.ncm,
+            idxEventoOrcGrupo = orcPed.pkEventoOrcPed,
+            grupo = orcPed.descricao
         };
 
         return novoMovtoped;
     }
 
-    public async Task<TpaEventoOrcPedDTO> CadastrarEventoOrcPed(EventoOrcPedAtendimento orcPed, int _idxDoctoped)
+    public async Task<TpaEventoOrcPedDTO> CadastrarEventoOrcPed(EventoOrcPedAtendimento orcPed, int _idxDoctoped, int _sequencia)
     {
         var _pkOrcPed = await CriarPkOrcPed();
         var novoOrcPed = new TpaEventoOrcPedDTO
         {
             idxDoctoPed = _idxDoctoped,
             pkEventoOrcPed = _pkOrcPed,
-            sequencia = orcPed.sequencia,
+            sequencia = _sequencia,
             tpImpressao = orcPed.tpImpressao,
             totItens = orcPed.totItens,
             quantidade = orcPed.quantidade,
@@ -220,6 +222,9 @@ public class CadastroPedido
             idxImg = orcPed.idxImg
         };
 
+        _context.EventoOrcPed.Add(novoOrcPed);
+        await _context.SaveChangesAsync();
+        //await _context.Entry(novoOrcPed).ReloadAsync();
         return novoOrcPed;
     }
 
@@ -230,15 +235,20 @@ public class CadastroPedido
         {
             var eventoOrc = await CadastrarEventoOrc(informacoesOr.eventoOrcAtendimento);
             var doctoped = await CadastrarDoctoped(informacoesOr.doctopedAtendimento, eventoOrc.pkEventoOrc);
-            foreach(var produto in informacoesOr.movtopedAtendimento)
-            {
-                var movtoped = await CadastrarMovtopedOR(produto, doctoped.pkDoctoped);
-                _context.Movtoped.Add(movtoped);
-            }
+            // foreach(var produto in informacoesOr.movtopedAtendimento)
+            // {
+            //     var movtoped = await CadastrarMovtopedOR(produto, doctoped.pkDoctoped);
+            //     _context.Movtoped.Add(movtoped);
+            // }
+            int sequenciaOrcPed = 1;
             foreach(var orcPed in informacoesOr.eventoOrcPedAtendimento)
             {
-                var _eventoOrcPed = await CadastrarEventoOrcPed(orcPed, doctoped.pkDoctoped);
-                _context.EventoOrcPed.Add(_eventoOrcPed);
+                var _eventoOrcPed = await CadastrarEventoOrcPed(orcPed, doctoped.pkDoctoped, sequenciaOrcPed++);
+                foreach(var produto in orcPed.produtos)
+                {
+                    var movtoped = await CadastrarMovtopedOR(produto, doctoped.pkDoctoped, _eventoOrcPed);
+                    _context.Movtoped.Add(movtoped);
+                }
             }
 
             await _context.SaveChangesAsync();
@@ -255,31 +265,31 @@ public class CadastroPedido
         }
     }
 
-    public async Task<int> CadastrarNovaEC(InformacoesOR informacoesOr)
-    {
-        using var transaction = await _context.Database.BeginTransactionAsync();
-        try
-        {
-            var doctoped = await CadastrarDoctoped(informacoesOr.doctopedAtendimento);
-            foreach(var produto in informacoesOr.movtopedAtendimento)
-            {
-                var movtoped = await CadastrarMovtopedOR(produto, doctoped.pkDoctoped);
-                _context.Movtoped.Add(movtoped);
-            }
-            await CadastrarDoctopedFP(doctoped.pkDoctoped, informacoesOr.doctopedAtendimento, informacoesOr.doctopedFpAtendimento);
+    // public async Task<int> CadastrarNovaEC(InformacoesOR informacoesOr)
+    // {
+    //     using var transaction = await _context.Database.BeginTransactionAsync();
+    //     try
+    //     {
+    //         var doctoped = await CadastrarDoctoped(informacoesOr.doctopedAtendimento);
+    //         foreach(var produto in informacoesOr.movtopedAtendimento)
+    //         {
+    //             var movtoped = await CadastrarMovtopedOR(produto, doctoped.pkDoctoped);
+    //             _context.Movtoped.Add(movtoped);
+    //         }
+    //         await CadastrarDoctopedFP(doctoped.pkDoctoped, informacoesOr.doctopedAtendimento, informacoesOr.doctopedFpAtendimento);
 
-            await _context.SaveChangesAsync();
-            await transaction.CommitAsync();
-            return doctoped.pkDoctoped;
-        }
-        catch(Exception e)
-        {
-            await transaction.RollbackAsync();
-            Console.WriteLine(e);
-            Console.WriteLine(JsonSerializer.Serialize(informacoesOr));
-            throw;
-        }
-    }
+    //         await _context.SaveChangesAsync();
+    //         await transaction.CommitAsync();
+    //         return doctoped.pkDoctoped;
+    //     }
+    //     catch(Exception e)
+    //     {
+    //         await transaction.RollbackAsync();
+    //         Console.WriteLine(e);
+    //         Console.WriteLine(JsonSerializer.Serialize(informacoesOr));
+    //         throw;
+    //     }
+    // }
 
 
 }

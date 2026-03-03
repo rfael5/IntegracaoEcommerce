@@ -57,4 +57,5 @@ public record EventoOrcPedAtendimento
 
     [Column("IDX_IMG")]
     public required string idxImg { get; init; } //Vai vir da tabela de tipo de serviços.
+    public List<MovtopedAtendimento> produtos { get; init; }
 }
