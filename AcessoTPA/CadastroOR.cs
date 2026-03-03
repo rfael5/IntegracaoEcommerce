@@ -50,10 +50,10 @@ public class CadastroPedido
         return ultimoIdMaisUm.ToString().PadLeft(12);
     }
 
-    public async Task<InformacoesProdutoTPA> GetDadosProduto(string _pkProduto)
+    public async Task<InformacoesProdutoTPA> GetDadosProduto(int _pkProduto)
     {
         Console.WriteLine(_pkProduto);
-        var result = await _context.Produto.Where(produto => produto.pkProduto.Trim() == _pkProduto.Trim()).SingleOrDefaultAsync();
+        var result = await _context.Produto.Where(produto => produto.id == _pkProduto).SingleOrDefaultAsync();
         if(result == null)
         {
             throw new InvalidOperationException("Produto não encontrado no banco de dados");
@@ -178,7 +178,7 @@ public class CadastroPedido
             descricao = movtoped.descricao,
             referencia = movtoped.referencia,
             tipoProd = movtoped.tipoProd,
-            idxProduto = movtoped.idxProduto,
+            idxProduto = dadosProduto.pkProduto,
             unidade = movtoped.unidade,
             cst = movtoped.cst,
             l_quantidade = movtoped.l_quantidade,

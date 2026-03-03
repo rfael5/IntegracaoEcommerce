@@ -5,6 +5,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 public class InformacoesProdutoTPA
 {
     [Key]
+    [Column("ID")]
+    public int id { get; init; }
     [Column("PK_PRODUTO")]
     public string pkProduto { get; init; }
     [Column("DESCRICAO")]

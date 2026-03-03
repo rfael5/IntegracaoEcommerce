@@ -16,7 +16,7 @@ public record MovtopedAtendimento
     [Column("TIPOPROD")]
     public string tipoProd { get; init; } // P se for receita, S se não for
     [Column("IDX_PRODUTO")] 
-    public string? idxProduto { get; init; } //id do produto na tabela do tpa
+    public int idxProduto { get; init; } //id do produto na tabela do tpa
     [Column("UNIDADE")] 
     public string unidade { get; init; } //unidade de venda do produto
     [Column("CST")] 
