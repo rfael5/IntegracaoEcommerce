@@ -163,4 +163,36 @@ public class UsuariosTPA
         }
         return userKeys;
     }
+
+    public async Task<PagedResponse<InformacoesCliente>> BuscarCadastros(QueryFilter filter, CancellationToken cancellationToken = default)
+    {
+        var pageNumber = Math.Max(1, filter.PageNumber);
+        var pageSize = Math.Clamp(filter.PageSize, 1, 50);
+
+        var query = _context.CadastroUsuarioTPA.AsNoTracking().AsQueryable();
+
+        var totalRecords = await query.CountAsync(cancellationToken);
+
+        var cadastros = await query.ApplyPagination(pageNumber, pageSize).Select(c => new InformacoesCliente
+        { 
+            id = c.id, 
+            pkCadastro = c.pkCadastro, 
+            nome = c.nome, 
+            fantasia = c.fantasia, 
+            pessoafj = c.pessoaFj
+        }).ToListAsync(cancellationToken);
+
+        return new PagedResponse<InformacoesCliente>
+        {
+            Data = cadastros,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalRecords = totalRecords,
+            TotalPages = (int)Math.Ceiling(totalRecords / (double)pageSize)
+        };
+
+        // const string _query = "SELECT ID, PK_CADASTRO, NOME, FANTASIA, PESSOAFJ FROM TPACADASTRO";
+        // var cadastros = await _context.CadastroUsuarioTPA.FromSqlRaw(_query).ToListAsync();
+        // return cadastros;
+    }
 }
