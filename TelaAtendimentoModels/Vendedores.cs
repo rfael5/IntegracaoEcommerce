@@ -1,0 +1,14 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+[Table("TPAFUNCIONARIO", Schema = "dbo")]
+public record VendedoresDTO
+{
+   [Key]
+   [Column("PK_FUNCIONARIO")]
+   public string pkFuncionario { get; init; }
+   [Column("NOME")]
+   public string nome { get; init; }
+   [Column("NOMEINTERNO")]
+   public string nomeInterno { get; init; } 
+}

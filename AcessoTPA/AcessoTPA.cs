@@ -40,6 +40,17 @@ public class AcessoTPA
         return result;
     }
 
+    public async Task<List<VendedoresDTO>> GetVendedores()
+    {
+        const string _query = @$"
+            SELECT PK_FUNCIONARIO, NOME, NOMEINTERNO FROM TPAFUNCIONARIO 
+                WHERE STATUS = 'A' AND VENDEDOR = 'S'
+            ORDER BY NOME
+        ";
+        var vendedores = await _context.Vendedores.FromSqlRaw(_query).ToListAsync();
+        return vendedores;
+    }
+
     public async Task<TpaDoctopedDTO> CadastrarEventoDoctoped(DadosPedido dadosPedido, string _idxEntidade, string _idxEnderecoObra)
     {
         var numeroDocumento = await CriarNumeroDocumentoEC();

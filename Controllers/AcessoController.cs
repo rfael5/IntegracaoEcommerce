@@ -44,6 +44,41 @@ public class UserController:ControllerBase
        return Ok(new {message = "ok"});
     }
 
+    [HttpGet("get-vendedores")]
+    public async Task<IActionResult> GetVendedores()
+    {
+        try
+        {
+            var result = await _acessoTpa.GetVendedores();
+            return Ok(new ResponseData
+            {
+                status = 200,
+                message = "OK",
+                data = result
+            });
+        }
+        catch(HttpRequestException e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(
+                (int?)e.StatusCode ?? 500,
+                new ResponseData
+                {
+                    status = (int?)e.StatusCode ?? 500,
+                    message = e.Message
+                });
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(500, new ResponseData
+            {
+                status = 500,
+                message = e.InnerException?.Message ?? e.Message
+            });
+        }
+    }
+
     //&pageNumber=1&pageSize=5
     [HttpGet("get-cadastros")]
     public async Task<IActionResult> GetCadastro([FromQuery] QueryFilter filter, CancellationToken cancellationToken)

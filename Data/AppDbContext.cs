@@ -52,6 +52,7 @@ public class AppDbContext : DbContext
     public DbSet<TpaEnderecoDTO> Enderecos { get; set; }
     public DbSet<TpaContatoDTO> Contatos { get; set; }
     public DbSet<TpaDoctoPedFpDTO> DoctopedFp { get; set; }
+    public DbSet<VendedoresDTO> Vendedores { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
