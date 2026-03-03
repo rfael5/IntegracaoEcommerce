@@ -223,7 +223,7 @@ public class CadastroPedido
         return novoOrcPed;
     }
 
-    public async Task<string> CadastrarNovaOr(InformacoesOR informacoesOr)
+    public async Task<int> CadastrarNovaOr(InformacoesOR informacoesOr)
     {
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
@@ -243,7 +243,7 @@ public class CadastroPedido
 
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
-            return $"OR {doctoped.documento} criada";
+            return doctoped.pkDoctoped;
 
         }
         catch(Exception e)
@@ -255,7 +255,7 @@ public class CadastroPedido
         }
     }
 
-    public async Task<string> CadastrarNovaEC(InformacoesOR informacoesOr)
+    public async Task<int> CadastrarNovaEC(InformacoesOR informacoesOr)
     {
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
@@ -270,7 +270,7 @@ public class CadastroPedido
 
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
-            return $"EC {doctoped.documento} criada";
+            return doctoped.pkDoctoped;
         }
         catch(Exception e)
         {
