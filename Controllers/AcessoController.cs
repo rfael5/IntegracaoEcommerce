@@ -167,41 +167,45 @@ public class UserController:ControllerBase
         }
     }
 
-    // [HttpPost("criar-ec")]
-    // public async Task<ResponseData> CriarEc([FromBody] InformacoesOR informacoesOr)
-    // {
-    //     try
-    //     {
-    //         var result = await _cadastroOr.CadastrarNovaEC(informacoesOr);
-    //         Console.WriteLine(result);
-    //         var message = new ResponseData
-    //         {
-    //             status = 200,
-    //             message = "OK",
-    //             data = result
-    //         };
-    //         return message;
-    //     }
-    //     catch(HttpRequestException e)
-    //     {
-    //         Console.WriteLine(e);
-    //         var message = new ResponseData
-    //         {
-    //             status = Convert.ToInt32(e.StatusCode),
-    //             message = e.Message
-    //         };
-    //         return message;
-    //     }
-    //     catch(Exception e)
-    //     {
-    //         Console.WriteLine(e);
-    //         var message = new ResponseData
-    //         {
-    //             status = 500,
-    //             message = e.Message               
-    //         };
-    //         return message;
-    //     }
-    // }
+    [HttpPost("criar-ec")]
+    public async Task<IActionResult> CriarEc([FromBody] InformacoesEC informacoesEc)
+    {
+        try
+        {
+            var result = await _cadastroOr.CadastrarNovaEc(informacoesEc);
+            Console.WriteLine(result);
+            return Ok(new ResponseData
+            {
+                status = 200,
+                message = "OK",
+                data = result
+            });
+        }
+        catch(HttpRequestException e)
+        {
+            Console.WriteLine(e);
+
+            return StatusCode(
+                (int?)e.StatusCode ?? 500,
+                new ResponseData
+                {
+                    status = (int?)e.StatusCode ?? 500,
+                    message = e.Message
+                });
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e);
+
+            return StatusCode(
+                500,
+                new ResponseData
+                {
+                    status = 500,
+                    message = e.InnerException?.Message ?? e.Message 
+                }
+            );
+        }
+    }
     
 }

@@ -17,9 +17,9 @@ public class CadastroPedido
         _acessoTpa = acessoTpa;
     }
 
-    public async Task<int?> CriarNumeroDocumentoOR()
+    public async Task<int?> CriarNumeroDocumentoOR(string tipoDocumento)
     { 
-        var maxDocumento = await _context.Doctoped.Where(doc => doc.tpDocto == "OR").MaxAsync(op => (int?)op.documento) ?? 0;
+        var maxDocumento = await _context.Doctoped.Where(doc => doc.tpDocto == tipoDocumento).MaxAsync(op => (int?)op.documento) ?? 0;
         Console.WriteLine(maxDocumento);
         Console.WriteLine(maxDocumento + 1);
         return maxDocumento + 1;
@@ -110,7 +110,7 @@ public class CadastroPedido
 
     public async Task<TpaDoctopedDTO> CadastrarDoctoped(DoctopedAtendimento doctoped, string? _idxDoctoEvento = null)
     {
-        var numeroDocumento = await CriarNumeroDocumentoOR();
+        var numeroDocumento = await CriarNumeroDocumentoOR(doctoped.tpDocto);
         var novaOR = new TpaDoctopedDTO()
         {
             operacao = doctoped.tpDocto == "OR" ? "OV" : "PV",
@@ -146,7 +146,7 @@ public class CadastroPedido
             opInc = doctoped.opInc,
             opAlt = doctoped.opAlt,
             entregar = doctoped.entregar,
-            idxDoctoEvento = _idxDoctoEvento,
+            idxDoctoEvento = _idxDoctoEvento == null ? "" : _idxDoctoEvento,
             contato = doctoped.contato,
             telefone = doctoped.telefone,
             email = doctoped.email,
@@ -166,7 +166,7 @@ public class CadastroPedido
         return novaOR;
     }
 
-    public async Task<TpaMovtopedDTO> CadastrarMovtopedOR(MovtopedAtendimento movtoped, int _rdxDoctoped, TpaEventoOrcPedDTO orcPed)
+    public async Task<TpaMovtopedDTO> CadastrarMovtoped(MovtopedAtendimento movtoped, int _rdxDoctoped, TpaEventoOrcPedDTO? orcPed = null)
     {
         var dadosProduto = await GetDadosProduto(movtoped.idxProduto);
         Console.WriteLine(JsonSerializer.Serialize(dadosProduto));
@@ -189,8 +189,8 @@ public class CadastroPedido
             opInc = movtoped.opInc,
             opAlt = movtoped.opAlt,
             ncm = movtoped.ncm,
-            idxEventoOrcGrupo = orcPed.pkEventoOrcPed,
-            grupo = orcPed.descricao
+            idxEventoOrcGrupo = orcPed == null ? "" : orcPed.pkEventoOrcPed,
+            grupo = orcPed == null ? "" : orcPed.descricao
         };
 
         return novoMovtoped;
@@ -228,6 +228,34 @@ public class CadastroPedido
         return novoOrcPed;
     }
 
+    public async Task<int> CadastrarNovaEc(InformacoesEC informacoesEc)
+    {
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            var doctoped = await CadastrarDoctoped(informacoesEc.doctopedAtendimento);
+            foreach(var produto in informacoesEc.movtopedAtendimento)
+            {
+                var movtoped = await CadastrarMovtoped(produto, doctoped.pkDoctoped);
+                _context.Movtoped.Add(movtoped);
+            }
+
+            await CadastrarDoctopedFP(doctoped.pkDoctoped, informacoesEc.doctopedAtendimento, informacoesEc.doctopedFpAtendimento);
+
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return doctoped.pkDoctoped;
+        }
+        catch(Exception e)
+        {
+            await transaction.RollbackAsync();
+            Console.WriteLine(e);
+            Console.WriteLine(JsonSerializer.Serialize(informacoesEc));
+            throw;
+        }
+    }
+
     public async Task<int> CadastrarNovaOr(InformacoesOR informacoesOr)
     {
         using var transaction = await _context.Database.BeginTransactionAsync();
@@ -246,7 +274,7 @@ public class CadastroPedido
                 var _eventoOrcPed = await CadastrarEventoOrcPed(orcPed, doctoped.pkDoctoped, sequenciaOrcPed++);
                 foreach(var produto in orcPed.produtos)
                 {
-                    var movtoped = await CadastrarMovtopedOR(produto, doctoped.pkDoctoped, _eventoOrcPed);
+                    var movtoped = await CadastrarMovtoped(produto, doctoped.pkDoctoped, _eventoOrcPed);
                     _context.Movtoped.Add(movtoped);
                 }
             }
