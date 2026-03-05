@@ -4,11 +4,11 @@ public class GetIp
 
     public GetIp(IHttpContextAccessor httpContextAcessor)
     {
-        this. httpContextAccessor = httpContextAcessor;
+        this.httpContextAccessor = httpContextAcessor;
     }
 
     public string? GetClientIp()
     {
-        return httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString();
+        return httpContextAccessor.HttpContext?.Request.Headers["X-Forwarded-For"].ToString();
     }
 }

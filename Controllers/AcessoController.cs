@@ -16,17 +16,20 @@ public class UserController:ControllerBase
     private readonly UsuariosTPA _usuariosTpa;
     private readonly AcessoEcommerce _acessoEcommerce;
     private readonly CadastroPedido _cadastroOr;
+    private readonly GetIp _getIp;
 
     public UserController(
-        AcessoTPA acessoTpa, 
-        UsuariosTPA usuariosTpa, 
+        AcessoTPA acessoTpa,
+        UsuariosTPA usuariosTpa,
         AcessoEcommerce acessoEcommerce,
-        CadastroPedido cadastroOr)
+        CadastroPedido cadastroOr,
+        GetIp getIp)
     {
         _acessoTpa = acessoTpa;
         _usuariosTpa = usuariosTpa;
         _acessoEcommerce = acessoEcommerce;
         _cadastroOr = cadastroOr;
+        _getIp = getIp;
     }
 
     public record ResponseData
@@ -40,8 +43,8 @@ public class UserController:ControllerBase
     [HttpGet("codigo-usuario")]
     public async Task<IActionResult> Teste()
     {
-       await _acessoEcommerce.GetOrders();
-       return Ok(new {message = "ok"});
+        await _acessoEcommerce.GetOrders();
+        return Ok(new { message = "ok" });
     }
 
     [HttpGet("get-vendedores")]
@@ -49,6 +52,16 @@ public class UserController:ControllerBase
     {
         try
         {
+            var ip = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+            if (string.IsNullOrEmpty(ip))
+            {
+                ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+            }
+
+            Console.WriteLine("##################################");
+            Console.WriteLine(ip);
+            Console.WriteLine("##################################");
+
             var result = await _acessoTpa.GetVendedores();
             return Ok(new ResponseData
             {
@@ -57,7 +70,7 @@ public class UserController:ControllerBase
                 data = result
             });
         }
-        catch(HttpRequestException e)
+        catch (HttpRequestException e)
         {
             Console.WriteLine(e);
             return StatusCode(
@@ -68,7 +81,7 @@ public class UserController:ControllerBase
                     message = e.Message
                 });
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Console.WriteLine(e);
             return StatusCode(500, new ResponseData
@@ -85,6 +98,15 @@ public class UserController:ControllerBase
     {
         try
         {
+            var ip = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+            if (string.IsNullOrEmpty(ip))
+            {
+                ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+            }
+
+            Console.WriteLine("##################################");
+            Console.WriteLine(ip);
+            Console.WriteLine("##################################");
             var result = await _usuariosTpa.BuscarCadastros(filter, cancellationToken);
             return Ok(new ResponseData
             {
@@ -93,7 +115,7 @@ public class UserController:ControllerBase
                 data = result
             });
         }
-        catch(HttpRequestException e)
+        catch (HttpRequestException e)
         {
             Console.WriteLine(e);
             return StatusCode(
@@ -104,7 +126,7 @@ public class UserController:ControllerBase
                     message = e.Message
                 });
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Console.WriteLine(e);
             return StatusCode(500, new ResponseData
@@ -118,6 +140,15 @@ public class UserController:ControllerBase
     [HttpGet("get-usuarios")]
     public async Task<IActionResult> VerUsuarios()
     {
+        var ip = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+        if (string.IsNullOrEmpty(ip))
+        {
+            ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+        }
+
+        Console.WriteLine("##################################");
+        Console.WriteLine(ip);
+        Console.WriteLine("##################################");
         var result = await _usuariosTpa.VerUsuario();
         return Ok(result);
     }
@@ -125,6 +156,15 @@ public class UserController:ControllerBase
     [HttpGet("get-movtoped")]
     public async Task<IActionResult> GetMovtoped()
     {
+        var ip = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+        if (string.IsNullOrEmpty(ip))
+        {
+            ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+        }
+
+        Console.WriteLine("##################################");
+        Console.WriteLine(ip);
+        Console.WriteLine("##################################");
         var result = await _acessoTpa.GetMovtoped();
         return Ok(result);
     }
@@ -134,6 +174,15 @@ public class UserController:ControllerBase
     {
         try
         {
+            var ip = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+            if (string.IsNullOrEmpty(ip))
+            {
+                ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+            }
+
+            Console.WriteLine("##################################");
+            Console.WriteLine(ip);
+            Console.WriteLine("##################################");
             var result = await _cadastroOr.CadastrarNovaOr(informacoesOr);
 
             return Ok(new ResponseData
@@ -181,7 +230,7 @@ public class UserController:ControllerBase
                 data = result
             });
         }
-        catch(HttpRequestException e)
+        catch (HttpRequestException e)
         {
             Console.WriteLine(e);
 
@@ -193,7 +242,7 @@ public class UserController:ControllerBase
                     message = e.Message
                 });
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Console.WriteLine(e);
 
@@ -202,10 +251,10 @@ public class UserController:ControllerBase
                 new ResponseData
                 {
                     status = 500,
-                    message = e.InnerException?.Message ?? e.Message 
+                    message = e.InnerException?.Message ?? e.Message
                 }
             );
         }
     }
-    
+
 }
