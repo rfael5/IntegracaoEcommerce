@@ -11,4 +11,6 @@ public record VendedoresDTO
    public string nome { get; init; }
    [Column("NOMEINTERNO")]
    public string nomeInterno { get; init; } 
+   [Column("IDX_OPSETOR")]
+   public string setor { get; init; }
 }

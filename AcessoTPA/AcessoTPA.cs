@@ -67,9 +67,10 @@ public class AcessoTPA
     public async Task<List<VendedoresDTO>> GetVendedores()
     {
         const string _query = @$"
-            SELECT PK_FUNCIONARIO, NOME, NOMEINTERNO FROM TPAFUNCIONARIO 
-                WHERE STATUS = 'A' AND VENDEDOR = 'S'
-            ORDER BY NOME
+            SELECT F.PK_FUNCIONARIO, F.NOME, F.NOMEINTERNO, O.IDX_OPSETOR FROM TPAFUNCIONARIO AS F
+                INNER JOIN TPAOPERADOR AS O ON F.PK_FUNCIONARIO = O.IDX_FUNCIONARIO 
+            WHERE F.STATUS = 'A' AND F.VENDEDOR = 'S'
+            ORDER BY F.NOME
         ";
         var vendedores = await _context.Vendedores.FromSqlRaw(_query).ToListAsync();
         return vendedores; 
