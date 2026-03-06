@@ -40,6 +40,30 @@ public class AcessoTPA
         return result;
     }
 
+    public async Task<List<ServicoProduto>> GetTiposServico(QueryFilter filter, CancellationToken cancellationToken = default)
+    {
+        var pageNumber = Math.Max(1, filter.PageNumber);
+        var pageSize = Math.Clamp(filter.PageSize, 1, 50);
+        var offset = (pageNumber - 1) * pageSize;
+
+        const string _query = @$"
+            SELECT PK_PRODEVENTOSV, TPSV.PK_EVENTOTPSV, TPSV.DESCRICAO, PRODUTO.PK_PRODUTO, PRODUTO.DESCRICAO AS NOME_PRODUTO
+                FROM TPAPRODEVENTOSV as PRODSV
+            INNER JOIN TPAEVENTOTPSV AS TPSV ON PRODSV.RDX_EVENTOSV = TPSV.PK_EVENTOTPSV
+            INNER JOIN TPAPRODUTO AS PRODUTO ON PRODSV.IDX_PRODUTO = PRODUTO.PK_PRODUTO
+            ORDER BY PK_PRODEVENTOSV
+            OFFSET @offset ROWS
+            FETCH NEXT @pageSize ROWS ONLY
+        ";
+
+
+        var response = await _context.ServicosProdutos
+            .FromSqlRaw(_query, 
+                new SqlParameter("@offset", offset), 
+                new SqlParameter("@pageSize", pageSize)).AsNoTracking().ToListAsync(cancellationToken);
+        return response;
+    }
+
     public async Task<List<VendedoresDTO>> GetVendedores()
     {
         const string _query = @$"
@@ -48,8 +72,9 @@ public class AcessoTPA
             ORDER BY NOME
         ";
         var vendedores = await _context.Vendedores.FromSqlRaw(_query).ToListAsync();
-        return vendedores;
+        return vendedores; 
     }
+
 
     public async Task<TpaDoctopedDTO> CadastrarEventoDoctoped(DadosPedido dadosPedido, string _idxEntidade, string _idxEnderecoObra)
     {

@@ -58,10 +58,6 @@ public class UserController:ControllerBase
                 ip = HttpContext.Connection.RemoteIpAddress?.ToString();
             }
 
-            Console.WriteLine("##################################");
-            Console.WriteLine(ip);
-            Console.WriteLine("##################################");
-
             var result = await _acessoTpa.GetVendedores();
             return Ok(new ResponseData
             {
@@ -90,6 +86,42 @@ public class UserController:ControllerBase
                 message = e.InnerException?.Message ?? e.Message
             });
         }
+    }
+
+    [HttpGet("relacao-produtos-servicos")]
+    public async Task<IActionResult> GetServicosProdutos([FromQuery] QueryFilter filter, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var result = await _acessoTpa.GetTiposServico(filter, cancellationToken);
+            return Ok(new ResponseData
+            {
+                status = 200,
+                message = "OK",
+                data = result
+            });
+        }
+         catch (HttpRequestException e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(
+                (int?)e.StatusCode ?? 500,
+                new ResponseData
+                {
+                    status = (int?)e.StatusCode ?? 500,
+                    message = e.Message
+                });
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(500, new ResponseData
+            {
+                status = 500,
+                message = e.InnerException?.Message ?? e.Message
+            });
+        }
+        
     }
 
     //&pageNumber=1&pageSize=5
