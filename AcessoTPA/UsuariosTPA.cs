@@ -164,7 +164,7 @@ public class UsuariosTPA
         return userKeys;
     }
 
-    public async Task<PagedResponse<InformacoesCliente>> BuscarCadastros(QueryFilter filter, CancellationToken cancellationToken = default)
+    public async Task<List<InformacoesCliente>> BuscarCadastros(QueryFilter filter, CancellationToken cancellationToken = default)
     {
         var pageNumber = Math.Max(1, filter.PageNumber);
         var pageSize = Math.Clamp(filter.PageSize, 1, 50);
@@ -182,14 +182,16 @@ public class UsuariosTPA
             pessoafj = c.pessoaFj
         }).ToListAsync(cancellationToken);
 
-        return new PagedResponse<InformacoesCliente>
-        {
-            Data = cadastros,
-            PageNumber = pageNumber,
-            PageSize = pageSize,
-            TotalRecords = totalRecords,
-            TotalPages = (int)Math.Ceiling(totalRecords / (double)pageSize)
-        };
+        return cadastros;
+
+        // return new PagedResponse<InformacoesCliente>
+        // {
+        //     Data = cadastros,
+        //     PageNumber = pageNumber,
+        //     PageSize = pageSize,
+        //     TotalRecords = totalRecords,
+        //     TotalPages = (int)Math.Ceiling(totalRecords / (double)pageSize)
+        // };
 
         // const string _query = "SELECT ID, PK_CADASTRO, NOME, FANTASIA, PESSOAFJ FROM TPACADASTRO";
         // var cadastros = await _context.CadastroUsuarioTPA.FromSqlRaw(_query).ToListAsync();
