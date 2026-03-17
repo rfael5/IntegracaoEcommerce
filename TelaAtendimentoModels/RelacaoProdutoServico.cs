@@ -15,4 +15,7 @@ public record ServicoProduto
     public string idProduto { get; init; }
     [Column("NOME_PRODUTO")]
     public string produto { get; init; }
+    [Column("VENDA")]
+    public string venda {get; init;}
+
 }
