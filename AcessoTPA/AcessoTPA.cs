@@ -64,6 +64,32 @@ public class AcessoTPA
         return response;
     }
 
+     public async Task<List<ServicoMateriais>> GetMateriais(QueryFilter filter, CancellationToken cancellationToken = default)
+    {
+        var pageNumber = Math.Max(1, filter.PageNumber);
+        var pageSize = Math.Clamp(filter.PageSize, 1, 50);
+        var offset = (pageNumber - 1) * pageSize;
+
+        const string _query = @$"
+            SELECT  
+            PRODUTO.PK_PRODUTO,
+            produto.CODPRODUTO,
+            PRODUTO.DESCRICAO AS NOME_PRODUTO
+            FROM  TPAPRODUTO AS PRODUTO 
+            where idx_negocio = 'locação de materiais'
+            ORDER BY PRODUTO.PK_PRODUTO
+            OFFSET @offset ROWS
+            FETCH NEXT @pageSize ROWS ONLY
+        ";
+
+
+        var Materiais= await _context.ServicosMateriais
+            .FromSqlRaw(_query, 
+                new SqlParameter("@offset", offset), 
+                new SqlParameter("@pageSize", pageSize)).AsNoTracking().ToListAsync(cancellationToken);
+        return Materiais;
+    }
+
     public async Task<List<VendedoresDTO>> GetVendedores()
     {
         const string _query = @$"

@@ -55,6 +55,7 @@ public class AppDbContext : DbContext
     public DbSet<VendedoresDTO> Vendedores { get; set; }
     public DbSet<ServicoProduto> ServicosProdutos { get; set; }
 
+   public DbSet<ServicoMateriais> ServicosMateriais { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<TpaCadastroDTO>().ToTable(tb => tb.UseSqlOutputClause(false));
