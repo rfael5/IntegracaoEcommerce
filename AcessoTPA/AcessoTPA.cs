@@ -51,6 +51,9 @@ public class AcessoTPA
                 FROM TPAPRODEVENTOSV as PRODSV
             INNER JOIN TPAEVENTOSV AS TPSV ON PRODSV.RDX_EVENTOSV = TPSV.PK_EVENTOSV
             INNER JOIN TPAPRODUTO AS PRODUTO ON PRODSV.IDX_PRODUTO = PRODUTO.PK_PRODUTO
+            WHERE PRODUTO.IDX_NEGOCIO NOT IN ('Manutenção', 'Desativados', 'Locação de Materiais') 
+                AND PRODUTO.STATUS = 'A'
+                AND PRODUTO.VENDA = 'S'
             ORDER BY PK_PRODEVENTOSV
             OFFSET @offset ROWS
             FETCH NEXT @pageSize ROWS ONLY
