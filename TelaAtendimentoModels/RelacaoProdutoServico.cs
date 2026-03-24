@@ -7,7 +7,7 @@ public record ServicoProduto
     [Column("PK_PRODEVENTOSV")]
     public string pkProdEventoSv { get; init; }
 
-    [Column("PK_EVENTOTPSV")]
+    [Column("PK_EVENTOSV")]
     public string idTipoServico { get; init; }
     [Column("DESCRICAO")]
     public string tipoServico { get; init; }

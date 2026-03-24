@@ -43,13 +43,13 @@ public class AcessoTPA
     public async Task<List<ServicoProduto>> GetTiposServico(QueryFilter filter, CancellationToken cancellationToken = default)
     {
         var pageNumber = Math.Max(1, filter.PageNumber);
-        var pageSize = Math.Clamp(filter.PageSize, 1, 50);
+        var pageSize = Math.Clamp(filter.PageSize, 1, 1000);
         var offset = (pageNumber - 1) * pageSize;
 
         const string _query = @$"
-            SELECT PK_PRODEVENTOSV, TPSV.PK_EVENTOTPSV, TPSV.DESCRICAO, PRODUTO.PK_PRODUTO, PRODUTO.DESCRICAO AS NOME_PRODUTO, PRODUTO.VENDA
+            SELECT PK_PRODEVENTOSV, TPSV.PK_EVENTOSV, TPSV.DESCRICAO, PRODUTO.PK_PRODUTO, PRODUTO.DESCRICAO AS NOME_PRODUTO, PRODUTO.VENDA
                 FROM TPAPRODEVENTOSV as PRODSV
-            INNER JOIN TPAEVENTOTPSV AS TPSV ON PRODSV.RDX_EVENTOSV = TPSV.PK_EVENTOTPSV
+            INNER JOIN TPAEVENTOSV AS TPSV ON PRODSV.RDX_EVENTOSV = TPSV.PK_EVENTOSV
             INNER JOIN TPAPRODUTO AS PRODUTO ON PRODSV.IDX_PRODUTO = PRODUTO.PK_PRODUTO
             ORDER BY PK_PRODEVENTOSV
             OFFSET @offset ROWS

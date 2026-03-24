@@ -76,3 +76,10 @@ public record UserKeys
     public string pkCadastro { get; set; }       
     public string pkEndereco { get; set; }       
 }
+
+public record ResponseData
+{
+    public int status { get; set; }
+    public string message { get; set; }
+    public object? data { get; set; } = null;
+}
