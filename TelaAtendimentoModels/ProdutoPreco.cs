@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-public record ProdutoEvento
+public record ProdutoPreco
 {
     [Key]
     [Column("ID")]
@@ -28,4 +28,10 @@ public record ProdutoEvento
     public string locacao { get; init; }
     [Column("NCM")]
     public string ncm { get; init; }
+    [Column("PK_TABELA")]
+    public string pkTabela { get; init; }
+    [Column("NOMETABELA")]
+    public string nomeTabela { get; init; }
+    [Column("PRECO1U1")]
+    public decimal preco { get; init; }
 }

@@ -20,10 +20,14 @@ builder.Services.AddScoped<AcessoEcommerce>();
 builder.Services.AddScoped<AcessoTPA>();
 builder.Services.AddScoped<UsuariosTPA>();
 builder.Services.AddScoped<CadastroPedido>();
+builder.Services.AddScoped<ProdutosTPA>();
 builder.Services.AddScoped<GetIp>();
 builder.Services.AddControllers();
 
 builder.Services.AddDbContext<AppDbContext>(options => 
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
+
+builder.Services.AddDbContext<PrincipalDbContext>(options => 
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
 
 builder.Services.AddHttpContextAccessor();

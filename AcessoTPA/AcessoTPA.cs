@@ -43,7 +43,7 @@ public class AcessoTPA
     public async Task<List<ServicoProduto>> GetTiposServico(QueryFilter filter, CancellationToken cancellationToken = default)
     {
         var pageNumber = Math.Max(1, filter.PageNumber);
-        var pageSize = Math.Clamp(filter.PageSize, 1, 1000);
+        var pageSize = Math.Clamp(filter.PageSize, 1, 100);
         var offset = (pageNumber - 1) * pageSize;
 
         const string _query = @$"
@@ -70,7 +70,7 @@ public class AcessoTPA
      public async Task<List<ServicoMateriais>> GetMateriais(QueryFilter filter, CancellationToken cancellationToken = default)
     {
         var pageNumber = Math.Max(1, filter.PageNumber);
-        var pageSize = Math.Clamp(filter.PageSize, 1, 50);
+        var pageSize = Math.Clamp(filter.PageSize, 1, 100);
         var offset = (pageNumber - 1) * pageSize;
 
         const string _query = @$"

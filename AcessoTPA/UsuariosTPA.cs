@@ -167,7 +167,7 @@ public class UsuariosTPA
     public async Task<List<InformacoesCliente>> BuscarCadastros(QueryFilter filter, CancellationToken cancellationToken = default)
     {
         var pageNumber = Math.Max(1, filter.PageNumber);
-        var pageSize = Math.Clamp(filter.PageSize, 1, 50);
+        var pageSize = Math.Clamp(filter.PageSize, 1, 100);
 
         var query = _context.CadastroUsuarioTPA.AsNoTracking().AsQueryable();
 

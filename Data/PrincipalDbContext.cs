@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 public class PrincipalDbContext : DbContext
 {
-    public PrincipalDbContext(DbContextOptions<AppDbContext> options) : base(options) {}
+    public PrincipalDbContext(DbContextOptions<PrincipalDbContext> options) : base(options) {}
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -17,7 +17,17 @@ public class PrincipalDbContext : DbContext
         optionsBuilder.UseSqlServer(connectionString); 
     }
 
-    public DbSet<ProdutoEvento> ProdutosEvento { get; set; }
-    public DbSet<TipoServico> Servicos { get; set; }
+    public DbSet<ProdutoEvento> ProdutosEvento{ get; set; }
+    public DbSet<ProdutoPreco> ProdutosPreco { get; set; }
+    public DbSet<ItemServico> ItensServico { get; set; }
+    public DbSet<ProdutoServico> ProdutosServico { get; set; }
+    public DbSet<TabelaPreco> TabelasPreco { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<ProdutoServico>().HasNoKey();
+
+        base.OnModelCreating(modelBuilder);
+    }
 
 }

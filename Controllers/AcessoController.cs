@@ -101,7 +101,7 @@ public class UserController:ControllerBase
                 data = result
             });
         }
-         catch (HttpRequestException e)
+        catch (HttpRequestException e)
         {
             Console.WriteLine(e);
             return StatusCode(
