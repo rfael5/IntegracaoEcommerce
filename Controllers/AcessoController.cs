@@ -16,20 +16,17 @@ public class UserController:ControllerBase
     private readonly UsuariosTPA _usuariosTpa;
     private readonly AcessoEcommerce _acessoEcommerce;
     private readonly CadastroPedido _cadastroOr;
-    private readonly GetIp _getIp;
 
     public UserController(
         AcessoTPA acessoTpa,
         UsuariosTPA usuariosTpa,
         AcessoEcommerce acessoEcommerce,
-        CadastroPedido cadastroOr,
-        GetIp getIp)
+        CadastroPedido cadastroOr)
     {
         _acessoTpa = acessoTpa;
         _usuariosTpa = usuariosTpa;
         _acessoEcommerce = acessoEcommerce;
         _cadastroOr = cadastroOr;
-        _getIp = getIp;
     }
 
     public record ResponseData

@@ -1,9 +1,6 @@
-using CsvHelper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Cors;
-using System.Globalization;
-using System.Text;
-using System.Text.Json;
+using System.Net;
 
 [ApiController]
 [ApiKey]
@@ -23,6 +20,7 @@ public class ProdutosController:ControllerBase
     {
         try
         {
+            GetClientIpAddress();
             var produtosServico = await _produtos.GetProdutoPorServico(filter, cancellationToken);
             return Ok(new ResponseData
             {
@@ -58,6 +56,7 @@ public class ProdutosController:ControllerBase
     {
         try
         {
+            GetClientIpAddress();
             var produtos = await _produtos.GetProdutosPreco(filter, cancellationToken);
             Console.WriteLine(produtos.Count());
 
@@ -95,6 +94,7 @@ public class ProdutosController:ControllerBase
     {
         try
         {
+            GetClientIpAddress();
             var produtos = await _produtos.GetProdutos(filter, cancellationToken);
             Console.WriteLine(produtos.Count());
             return Ok(new ResponseData
@@ -131,6 +131,7 @@ public class ProdutosController:ControllerBase
     {
         try
         {
+            GetClientIpAddress();
             var materiais = await _produtos.GetMateriais(filter, cancellationToken);
             return Ok(new ResponseData
             {
@@ -166,6 +167,7 @@ public class ProdutosController:ControllerBase
     {
         try
         {
+            GetClientIpAddress();
             var itensServico = await _produtos.GetItensServico();
             return Ok(new ResponseData
             {
@@ -201,6 +203,7 @@ public class ProdutosController:ControllerBase
     {
         try
         {
+            GetClientIpAddress();
             var tabelasPreco = await _produtos.GetTabelasPreco();
             return Ok(new ResponseData
             {
@@ -228,6 +231,32 @@ public class ProdutosController:ControllerBase
                 status = 500,
                 message = e.InnerException?.Message ?? e.Message
             });
+        }
+    }
+
+    public void GetClientIpAddress()
+    {
+        try
+        {
+            var forwarded = HttpContext.Request.Headers["X-Forwarded-For"].ToString();
+            if(!string.IsNullOrEmpty(forwarded))
+            {
+                var firstIp = forwarded.Split(',')[0].Trim();
+                if (IPAddress.TryParse(firstIp, out _))
+                {
+                    Console.WriteLine("###################################");
+                    Console.WriteLine(firstIp);
+                    Console.WriteLine("###################################");
+                }
+            }
+
+            Console.WriteLine("###################################");
+            Console.WriteLine(HttpContext.Connection.RemoteIpAddress?.ToString());
+            Console.WriteLine("###################################");
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e);
         }
     }
 

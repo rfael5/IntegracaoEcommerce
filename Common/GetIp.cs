@@ -1,14 +1,41 @@
-public class GetIp
+using System.Net;
+
+public static class GetIp
 {
-    private readonly IHttpContextAccessor httpContextAccessor;
-
-    public GetIp(IHttpContextAccessor httpContextAcessor)
+    public static void GetClientIpAddress(this HttpContext context)
     {
-        this.httpContextAccessor = httpContextAcessor;
-    }
+        try
+        {
+            var forwarded = context.Request.Headers["X-Forwarded-For"].ToString();
+            if(!string.IsNullOrEmpty(forwarded))
+            {
+                var firstIp = forwarded.Split(',')[0].Trim();
+                if (IPAddress.TryParse(firstIp, out _))
+                {
+                    Console.WriteLine("###################################");
+                    Console.WriteLine(firstIp);
+                    Console.WriteLine("###################################");
+                }
+            }
 
-    public string? GetClientIp()
-    {
-        return httpContextAccessor.HttpContext?.Request.Headers["X-Forwarded-For"].ToString();
+            Console.WriteLine("###################################");
+            Console.WriteLine(context.Connection.RemoteIpAddress?.ToString());
+            Console.WriteLine("###################################");
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e);
+        }
     }
+    // private readonly IHttpContextAccessor httpContextAccessor;
+
+    // public GetIp(IHttpContextAccessor httpContextAcessor)
+    // {
+    //     this.httpContextAccessor = httpContextAcessor;
+    // }
+
+    // public string? GetClientIp()
+    // {
+    //     return httpContextAccessor.HttpContext?.Request.Headers["X-Forwarded-For"].ToString();
+    // }
 }
