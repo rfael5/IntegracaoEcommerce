@@ -18,7 +18,6 @@ public class ProdutosController:ControllerBase
     }
 
     [EnableCors("All")]
-
     [HttpGet("produtos-servico")]
     public async Task<IActionResult> BuscarProdutosServico([FromQuery] QueryFilter filter, CancellationToken cancellationToken)
     {
