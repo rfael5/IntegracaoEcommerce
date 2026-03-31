@@ -74,7 +74,7 @@ public class UserController:ControllerBase
             Console.WriteLine(e);
             return StatusCode(
                 (int?)e.StatusCode ?? 500,
-                new PagedResponseData
+                new ResponseData
                 {
                     status = (int?)e.StatusCode ?? 500,
                     message = e.Message
@@ -83,7 +83,7 @@ public class UserController:ControllerBase
         catch (Exception e)
         {
             Console.WriteLine(e);
-            return StatusCode(500, new PagedResponseData
+            return StatusCode(500, new ResponseData
             {
                 status = 500,
                 message = e.InnerException?.Message ?? e.Message
@@ -187,7 +187,7 @@ public class UserController:ControllerBase
             Console.WriteLine(e);
             return StatusCode(
                 (int?)e.StatusCode ?? 500,
-                new PagedResponseData
+                new ResponseData
                 {
                     status = (int?)e.StatusCode ?? 500,
                     message = e.Message
@@ -196,7 +196,7 @@ public class UserController:ControllerBase
         catch (Exception e)
         {
             Console.WriteLine(e);
-            return StatusCode(500, new PagedResponseData
+            return StatusCode(500, new ResponseData
             {
                 status = 500,
                 message = e.InnerException?.Message ?? e.Message
