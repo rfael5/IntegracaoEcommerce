@@ -45,7 +45,7 @@ public class UserController:ControllerBase
     }
 
     [HttpGet("get-vendedores")]
-    public async Task<IActionResult> GetVendedores()
+    public async Task<IActionResult> GetVendedores([FromQuery] QueryFilter filter, CancellationToken cancellationToken)
     {
         try
         {
@@ -55,12 +55,18 @@ public class UserController:ControllerBase
                 ip = HttpContext.Connection.RemoteIpAddress?.ToString();
             }
 
-            var result = await _acessoTpa.GetVendedores();
-            return Ok(new ResponseData
+            var result = await _acessoTpa.GetVendedores(filter, cancellationToken);
+            return Ok(new PagedResponseData
             {
                 status = 200,
                 message = "OK",
-                data = result
+                data = result.Data,
+                pageNumber = result.PageNumber,
+                pageSize = result.PageSize,
+                totalPages = result.TotalPages,
+                totalRecords = result.TotalRecords,
+                hasNextPage = result.HasNextPage,
+                hasPreviousPage = result.HasPreviousPage
             });
         }
         catch (HttpRequestException e)
@@ -68,7 +74,7 @@ public class UserController:ControllerBase
             Console.WriteLine(e);
             return StatusCode(
                 (int?)e.StatusCode ?? 500,
-                new ResponseData
+                new PagedResponseData
                 {
                     status = (int?)e.StatusCode ?? 500,
                     message = e.Message
@@ -77,7 +83,7 @@ public class UserController:ControllerBase
         catch (Exception e)
         {
             Console.WriteLine(e);
-            return StatusCode(500, new ResponseData
+            return StatusCode(500, new PagedResponseData
             {
                 status = 500,
                 message = e.InnerException?.Message ?? e.Message
@@ -118,8 +124,8 @@ public class UserController:ControllerBase
                 message = e.InnerException?.Message ?? e.Message
             });
         }
-        
     }
+
     [HttpGet("relacao-materiais-servicos")]
     public async Task<IActionResult> GetServicosMateriais([FromQuery] QueryFilter filter, CancellationToken cancellationToken)
     {
@@ -162,21 +168,18 @@ public class UserController:ControllerBase
     {
         try
         {
-            var ip = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
-            if (string.IsNullOrEmpty(ip))
-            {
-                ip = HttpContext.Connection.RemoteIpAddress?.ToString();
-            }
-
-            Console.WriteLine("##################################");
-            Console.WriteLine(ip);
-            Console.WriteLine("##################################");
             var result = await _usuariosTpa.BuscarCadastros(filter, cancellationToken);
-            return Ok(new ResponseData
+            return Ok(new PagedResponseData
             {
                 status = 200,
                 message = "OK",
-                data = result
+                data = result.Data,
+                pageNumber = result.PageNumber,
+                pageSize = result.PageSize,
+                totalPages = result.TotalPages,
+                totalRecords = result.TotalRecords,
+                hasNextPage = result.HasNextPage,
+                hasPreviousPage = result.HasPreviousPage
             });
         }
         catch (HttpRequestException e)
@@ -184,7 +187,7 @@ public class UserController:ControllerBase
             Console.WriteLine(e);
             return StatusCode(
                 (int?)e.StatusCode ?? 500,
-                new ResponseData
+                new PagedResponseData
                 {
                     status = (int?)e.StatusCode ?? 500,
                     message = e.Message
@@ -193,7 +196,7 @@ public class UserController:ControllerBase
         catch (Exception e)
         {
             Console.WriteLine(e);
-            return StatusCode(500, new ResponseData
+            return StatusCode(500, new PagedResponseData
             {
                 status = 500,
                 message = e.InnerException?.Message ?? e.Message

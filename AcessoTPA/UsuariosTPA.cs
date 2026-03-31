@@ -1,6 +1,4 @@
 using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 public class UsuariosTPA
@@ -17,18 +15,15 @@ public class UsuariosTPA
         var maxCodigoCliente = await _context.CadastroUsuarioTPA.MaxAsync(usuario => usuario.codCadastro);
         var intCodigo = Convert.ToInt32(maxCodigoCliente) + 1;
         var novoCodigo = intCodigo.ToString("D6");
-        Console.WriteLine(novoCodigo);
         return novoCodigo;
     }
 
     public async Task<string> CriarPkCadastro()
     {
-        //var ultimoId = await _context.CadastroUsuarioTPA.OrderByDescending(u => u.id).Select(u => u.id).FirstAsync();
         var ultimoId = await _context.Database
         .SqlQueryRaw<int>("SELECT MAX(ID) AS Value FROM TPACADASTRO")
         .FirstAsync();
         var ultimoIdMaisUm = ultimoId + 1;
-        //var teste = "       50526";
         var novoPkCadastro = $"       {ultimoIdMaisUm}";
         return novoPkCadastro;
     }
@@ -66,9 +61,6 @@ public class UsuariosTPA
         }
         else
         {
-            Console.WriteLine(cadastro.pkCadastro);
-            Console.WriteLine("################################");
-            Console.WriteLine(JsonSerializer.Serialize(cadastro));
             _pkEndereco = await _context.Enderecos.Where(end => end.idxTabela == cadastro.pkCadastro).Select(end => end.pkEndereco).SingleOrDefaultAsync() ?? "";
         }
         return new UserKeys(){pkCadastro = cadastro.pkCadastro, pkEndereco = _pkEndereco};
@@ -77,8 +69,6 @@ public class UsuariosTPA
     public async Task<TpaCadastroDTO> CadastrarUsuario(DadosCliente dadosCliente)
     {
         var novoCodigo = await CriarCodigoCliente();
-        //var novoPkCadastro = await CriarPkCadastro();
-        Console.WriteLine(novoCodigo);
         var novoUsuario = new TpaCadastroDTO()
         {
             pkCadastro = await CriarPkCadastro(),
@@ -164,7 +154,7 @@ public class UsuariosTPA
         return userKeys;
     }
 
-    public async Task<List<InformacoesCliente>> BuscarCadastros(QueryFilter filter, CancellationToken cancellationToken = default)
+    public async Task<PagedResponse<InformacoesCliente>> BuscarCadastros(QueryFilter filter, CancellationToken cancellationToken = default)
     {
         var pageNumber = Math.Max(1, filter.PageNumber);
         var pageSize = Math.Clamp(filter.PageSize, 1, 100);
@@ -182,16 +172,16 @@ public class UsuariosTPA
             pessoafj = c.pessoaFj
         }).ToListAsync(cancellationToken);
 
-        return cadastros;
+        //return cadastros;
 
-        // return new PagedResponse<InformacoesCliente>
-        // {
-        //     Data = cadastros,
-        //     PageNumber = pageNumber,
-        //     PageSize = pageSize,
-        //     TotalRecords = totalRecords,
-        //     TotalPages = (int)Math.Ceiling(totalRecords / (double)pageSize)
-        // };
+        return new PagedResponse<InformacoesCliente>
+        {
+            Data = cadastros,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalRecords = totalRecords,
+            TotalPages = (int)Math.Ceiling(totalRecords / (double)pageSize)
+        };
 
         // const string _query = "SELECT ID, PK_CADASTRO, NOME, FANTASIA, PESSOAFJ FROM TPACADASTRO";
         // var cadastros = await _context.CadastroUsuarioTPA.FromSqlRaw(_query).ToListAsync();

@@ -22,11 +22,17 @@ public class ProdutosController:ControllerBase
         {
             GetClientIpAddress();
             var produtosServico = await _produtos.GetProdutoPorServico(filter, cancellationToken);
-            return Ok(new ResponseData
+            return Ok(new PagedResponseData
             {
                 status = 200,
                 message = "OK",
-                data = produtosServico
+                data = produtosServico.Data,
+                pageNumber = produtosServico.PageNumber,
+                pageSize = produtosServico.PageSize,
+                totalPages = produtosServico.TotalPages,
+                totalRecords = produtosServico.TotalRecords,
+                hasNextPage = produtosServico.HasNextPage,
+                hasPreviousPage = produtosServico.HasPreviousPage
             });
         }
         catch(HttpRequestException e)
@@ -34,7 +40,7 @@ public class ProdutosController:ControllerBase
             Console.WriteLine(e);
             return StatusCode(
                 (int?)e.StatusCode ?? 500,
-                new ResponseData
+                new PagedResponseData
                 {
                     status = (int?)e.StatusCode ?? 500,
                     message = e.Message
@@ -43,7 +49,7 @@ public class ProdutosController:ControllerBase
         catch(Exception e)
         {
             Console.WriteLine(e);
-            return StatusCode(500, new ResponseData
+            return StatusCode(500, new PagedResponseData
             {
                 status = 500,
                 message = e.InnerException?.Message ?? e.Message
@@ -58,13 +64,18 @@ public class ProdutosController:ControllerBase
         {
             GetClientIpAddress();
             var produtos = await _produtos.GetProdutosPreco(filter, cancellationToken);
-            Console.WriteLine(produtos.Count());
 
-            return Ok(new ResponseData
+            return Ok(new PagedResponseData
             {
                 status = 200,
                 message = "OK",
-                data = produtos
+                data = produtos.Data,
+                pageNumber = produtos.PageNumber,
+                pageSize = produtos.PageSize,
+                totalPages = produtos.TotalPages,
+                totalRecords = produtos.TotalRecords,
+                hasNextPage = produtos.HasNextPage,
+                hasPreviousPage = produtos.HasPreviousPage   
             });
         }
         catch(HttpRequestException e)
@@ -72,7 +83,7 @@ public class ProdutosController:ControllerBase
             Console.WriteLine(e);
             return StatusCode(
                 (int?)e.StatusCode ?? 500,
-                new ResponseData
+                new PagedResponseData
                 {
                     status = (int?)e.StatusCode ?? 500,
                     message = e.Message
@@ -81,7 +92,7 @@ public class ProdutosController:ControllerBase
         catch(Exception e)
         {
             Console.WriteLine(e);
-            return StatusCode(500, new ResponseData
+            return StatusCode(500, new PagedResponseData
             {
                 status = 500,
                 message = e.InnerException?.Message ?? e.Message
@@ -96,12 +107,17 @@ public class ProdutosController:ControllerBase
         {
             GetClientIpAddress();
             var produtos = await _produtos.GetProdutos(filter, cancellationToken);
-            Console.WriteLine(produtos.Count());
-            return Ok(new ResponseData
+            return Ok(new PagedResponseData
             {
                 status = 200,
                 message = "OK",
-                data = produtos
+                data = produtos.Data,
+                pageNumber = produtos.PageNumber,
+                pageSize = produtos.PageSize,
+                totalPages = produtos.TotalPages,
+                totalRecords = produtos.TotalRecords,
+                hasNextPage = produtos.HasNextPage,
+                hasPreviousPage = produtos.HasPreviousPage           
             });
         }
         catch(HttpRequestException e)
@@ -109,7 +125,7 @@ public class ProdutosController:ControllerBase
             Console.WriteLine(e);
             return StatusCode(
                 (int?)e.StatusCode ?? 500,
-                new ResponseData
+                new PagedResponseData
                 {
                     status = (int?)e.StatusCode ?? 500,
                     message = e.Message
@@ -118,7 +134,7 @@ public class ProdutosController:ControllerBase
         catch(Exception e)
         {
             Console.WriteLine(e);
-            return StatusCode(500, new ResponseData
+            return StatusCode(500, new PagedResponseData
             {
                 status = 500,
                 message = e.InnerException?.Message ?? e.Message
@@ -133,11 +149,17 @@ public class ProdutosController:ControllerBase
         {
             GetClientIpAddress();
             var materiais = await _produtos.GetMateriais(filter, cancellationToken);
-            return Ok(new ResponseData
+            return Ok(new PagedResponseData
             {
                 status = 200,
                 message = "OK",
-                data = materiais
+                data = materiais.Data,
+                pageNumber = materiais.PageNumber,
+                pageSize = materiais.PageSize,
+                totalPages = materiais.TotalPages,
+                totalRecords = materiais.TotalRecords,
+                hasNextPage = materiais.HasNextPage,
+                hasPreviousPage = materiais.HasPreviousPage  
             });
         }
         catch(HttpRequestException e)
@@ -145,7 +167,7 @@ public class ProdutosController:ControllerBase
             Console.WriteLine(e);
             return StatusCode(
                 (int?)e.StatusCode ?? 500,
-                new ResponseData
+                new PagedResponseData
                 {
                     status = (int?)e.StatusCode ?? 500,
                     message = e.Message
@@ -154,7 +176,7 @@ public class ProdutosController:ControllerBase
         catch(Exception e)
         {
             Console.WriteLine(e);
-            return StatusCode(500, new ResponseData
+            return StatusCode(500, new PagedResponseData
             {
                 status = 500,
                 message = e.InnerException?.Message ?? e.Message
@@ -169,11 +191,17 @@ public class ProdutosController:ControllerBase
         {
             GetClientIpAddress();
             var itensServico = await _produtos.GetItensServico();
-            return Ok(new ResponseData
+            return Ok(new PagedResponseData
             {
                 status = 200,
                 message = "OK",
-                data = itensServico
+                data = itensServico.Data,
+                pageNumber = itensServico.PageNumber,
+                pageSize = itensServico.PageSize,
+                totalPages = itensServico.TotalPages,
+                totalRecords = itensServico.TotalRecords,
+                hasNextPage = itensServico.HasNextPage,
+                hasPreviousPage = itensServico.HasPreviousPage  
             });
         }
         catch(HttpRequestException e)
@@ -181,7 +209,7 @@ public class ProdutosController:ControllerBase
             Console.WriteLine(e);
             return StatusCode(
                 (int?)e.StatusCode ?? 500,
-                new ResponseData
+                new PagedResponseData
                 {
                     status = (int?)e.StatusCode ?? 500,
                     message = e.Message
@@ -190,7 +218,7 @@ public class ProdutosController:ControllerBase
         catch(Exception e)
         {
             Console.WriteLine(e);
-            return StatusCode(500, new ResponseData
+            return StatusCode(500, new PagedResponseData
             {
                 status = 500,
                 message = e.InnerException?.Message ?? e.Message
@@ -205,11 +233,17 @@ public class ProdutosController:ControllerBase
         {
             GetClientIpAddress();
             var tabelasPreco = await _produtos.GetTabelasPreco();
-            return Ok(new ResponseData
+            return Ok(new PagedResponseData
             {
                 status = 200,
                 message = "OK",
-                data = tabelasPreco
+                data = tabelasPreco.Data,
+                pageNumber = tabelasPreco.PageNumber,
+                pageSize = tabelasPreco.PageSize,
+                totalPages = tabelasPreco.TotalPages,
+                totalRecords = tabelasPreco.TotalRecords,
+                hasNextPage = tabelasPreco.HasNextPage,
+                hasPreviousPage = tabelasPreco.HasPreviousPage
             });
         }
         catch(HttpRequestException e)
@@ -217,7 +251,7 @@ public class ProdutosController:ControllerBase
             Console.WriteLine(e);
             return StatusCode(
                 (int?)e.StatusCode ?? 500,
-                new ResponseData
+                new PagedResponseData
                 {
                     status = (int?)e.StatusCode ?? 500,
                     message = e.Message
@@ -226,7 +260,7 @@ public class ProdutosController:ControllerBase
         catch(Exception e)
         {
             Console.WriteLine(e);
-            return StatusCode(500, new ResponseData
+            return StatusCode(500, new PagedResponseData
             {
                 status = 500,
                 message = e.InnerException?.Message ?? e.Message

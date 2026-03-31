@@ -8,10 +8,12 @@ using WooCommerceNET;
 public class AcessoTPA
 {
     private readonly AppDbContext _context;
+    private readonly PrincipalDbContext _dbPrincipal;
     private UsuariosTPA _usuariosService;
-    public AcessoTPA(AppDbContext context, UsuariosTPA usuariosService)
+    public AcessoTPA(AppDbContext context, UsuariosTPA usuariosService, PrincipalDbContext dbPrincipal)
     {
         _context = context;
+        _dbPrincipal = dbPrincipal;
         _usuariosService = usuariosService;
     }
 
@@ -93,16 +95,42 @@ public class AcessoTPA
         return Materiais;
     }
 
-    public async Task<List<VendedoresDTO>> GetVendedores()
+    public async Task<PagedResponse<VendedoresDTO>> GetVendedores(QueryFilter filter, CancellationToken cancellationToken = default)
     {
+        var pageNumber = Math.Max(1, filter.PageNumber);
+        var pageSize = Math.Clamp(filter.PageSize, 1, 100);
+        var offset = (pageNumber - 1) * pageSize;
+
         const string _query = @$"
             SELECT F.PK_FUNCIONARIO, F.NOME, F.NOMEINTERNO, O.IDX_OPSETOR FROM TPAFUNCIONARIO AS F
                 INNER JOIN TPAOPERADOR AS O ON F.PK_FUNCIONARIO = O.IDX_FUNCIONARIO 
             WHERE F.STATUS = 'A' AND F.VENDEDOR = 'S'
             ORDER BY F.NOME
+            OFFSET @offset ROWS
+            FETCH NEXT @pageSize ROWS ONLY
         ";
-        var vendedores = await _context.Vendedores.FromSqlRaw(_query).ToListAsync();
-        return vendedores; 
+
+        const string count = @"
+            SELECT COUNT(*) AS Value FROM TPAFUNCIONARIO AS F
+                INNER JOIN TPAOPERADOR AS O ON F.PK_FUNCIONARIO = O.IDX_FUNCIONARIO 
+            WHERE F.STATUS = 'A' AND F.VENDEDOR = 'S'
+        ";
+
+        var totalRecords = await _dbPrincipal.Database.SqlQueryRaw<int>(count).SingleAsync(cancellationToken);
+
+        var vendedores = await _context.Vendedores.FromSqlRaw(
+                _query,
+                new SqlParameter("@offset", offset),
+                new SqlParameter("@pageSize", pageSize)).AsNoTracking().ToListAsync(cancellationToken);
+        
+        return new PagedResponse<VendedoresDTO>
+        {
+            Data = vendedores,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalRecords = totalRecords,
+            TotalPages = (int)Math.Ceiling(totalRecords / (double)pageSize)
+        }; 
     }
 
 

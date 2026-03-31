@@ -83,3 +83,16 @@ public record ResponseData
     public string message { get; set; }
     public object? data { get; set; } = null;
 }
+
+public record PagedResponseData
+{
+    public int status { get; set; }
+    public string message { get; set; }
+    public object? data { get; set; } = null;
+    public int? pageNumber { get; set; }
+    public int? pageSize { get; set; }
+    public int? totalPages { get; set; }
+    public int? totalRecords { get; set; }
+    public bool? hasNextPage { get; set; }
+    public bool? hasPreviousPage { get; set; }
+}
