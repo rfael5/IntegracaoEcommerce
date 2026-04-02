@@ -159,10 +159,8 @@ public class UserController:ControllerBase
                 message = e.InnerException?.Message ?? e.Message
             });
         }
-        
     }
 
-    //&pageNumber=1&pageSize=5
     [HttpGet("get-cadastros")]
     public async Task<IActionResult> GetCadastro([FromQuery] QueryFilter filter, CancellationToken cancellationToken)
     {
