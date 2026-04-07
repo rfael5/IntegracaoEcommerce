@@ -102,7 +102,7 @@ public class AcessoTPA
         var offset = (pageNumber - 1) * pageSize;
 
         const string _query = @$"
-            SELECT F.PK_FUNCIONARIO, F.NOME, F.NOMEINTERNO, O.IDX_OPSETOR FROM TPAFUNCIONARIO AS F
+            SELECT F.PK_FUNCIONARIO, F.NOME, F.NOMEINTERNO, O.IDX_OPSETOR, O.PK_OPERADOR FROM TPAFUNCIONARIO AS F
                 INNER JOIN TPAOPERADOR AS O ON F.PK_FUNCIONARIO = O.IDX_FUNCIONARIO 
             WHERE F.STATUS = 'A' AND F.VENDEDOR = 'S'
             ORDER BY F.NOME
