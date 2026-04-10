@@ -259,4 +259,22 @@ public class AcessoTPA
                 throw;
             }
     }
+
+    public async Task CancelarDocumento(int pkDoctoped, int operador)
+    {
+        var now = BrazilTime.Now();
+        const string _query = @$"
+            UPDATE TPADOCTOPED 
+                SET SITUACAO = 'C',
+                OPALT = @operador,
+                DTALT = @now
+            WHERE PK_DOCTOPED = @pkDoctoped
+        ";
+
+        await _context.Database.ExecuteSqlRawAsync(
+            _query,
+            new SqlParameter("operador", operador),
+            new SqlParameter("now", now),
+            new SqlParameter("pkDoctoped", pkDoctoped));
+    }
 }

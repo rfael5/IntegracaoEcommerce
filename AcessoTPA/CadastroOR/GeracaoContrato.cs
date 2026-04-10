@@ -157,7 +157,7 @@ public class GeracaoContrato
         _context.DoctopedHistorico.Add(doctopedHistorico);
     }
 
-    public async Task<int> FecharOrcamento(int pkDoctoped, int operador, string temProfissional)
+    public async Task<int> GerarContrato(int pkDoctoped, int operador, string temProfissional)
     {
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
@@ -230,13 +230,6 @@ public class GeracaoContrato
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
             return pkContrato;
-        }
-        catch (DbUpdateException e)
-        {
-            Console.WriteLine("#######################");
-            Console.WriteLine(e.InnerException?.Message);
-            Console.WriteLine("#######################");
-            throw;
         }
         catch (Exception e)
         {
