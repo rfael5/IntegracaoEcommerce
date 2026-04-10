@@ -12,22 +12,6 @@ public class ProdutosTPA
         _dbPrincipal = dbPrincipal;
     }
 
-    // public async Task<List<TipoServico>> MesclarProdutosServicos()
-    // {
-    //     var servicos = await GetTiposServico();
-   //     List<TipoServico> tiposServico = [];
-    //     var produtos = await GetProdutoPorServico();
-
-    //     foreach(var item in servicos)
-    //     {
-    //         var local = item;
-    //         local.itensServico = produtos.Where((prod) => prod.idTipoServico == item.id).ToList();
-    //         tiposServico.Add(local);
-    //     }
-
-    //     return tiposServico;
-    // }
-
     public async Task<PagedResponse<ProdutoServico>> GetProdutoPorServico(QueryFilter filter, CancellationToken cancellationToken = default)
     {
         var pageNumber = Math.Max(1, filter.PageNumber);
@@ -285,5 +269,5 @@ public class ProdutosTPA
             TotalPages = (int)Math.Ceiling(totalRecords / (double)100)
         };
     }
-    
+
 }
