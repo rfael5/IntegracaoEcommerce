@@ -56,8 +56,12 @@ public class AppDbContext : DbContext
     public DbSet<ServicoProduto> ServicosProdutos { get; set; }
     public DbSet<TpaAjustePedDTO> AjustePed { get; set; }
     public DbSet<TpaAjustePedItemDTO> AjustePedItem { get; set; }
-
+    public DbSet<TpaContratoDTO> Contratos { get; set; }
+    public DbSet<TpaContratoMovDTO> ContratoMov { get; set; }
+    public DbSet<TpaContratoItemDTO> ContratoItem { get; set; }
+    public DbSet<TpaDoctopedHistoricoDTO> DoctopedHistorico { get; set; }
    public DbSet<ServicoMateriais> ServicosMateriais { get; set; }
+   
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<TpaCadastroDTO>().ToTable(tb => tb.UseSqlOutputClause(false));

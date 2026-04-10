@@ -16,17 +16,27 @@ public class UserController:ControllerBase
     private readonly UsuariosTPA _usuariosTpa;
     private readonly AcessoEcommerce _acessoEcommerce;
     private readonly CadastroPedido _cadastroOr;
+    private readonly GeracaoContrato _geracaoContrato;
 
     public UserController(
         AcessoTPA acessoTpa,
         UsuariosTPA usuariosTpa,
         AcessoEcommerce acessoEcommerce,
-        CadastroPedido cadastroOr)
+        CadastroPedido cadastroOr,
+        GeracaoContrato geracaoContrato)
     {
         _acessoTpa = acessoTpa;
         _usuariosTpa = usuariosTpa;
         _acessoEcommerce = acessoEcommerce;
         _cadastroOr = cadastroOr;
+        _geracaoContrato = geracaoContrato;
+    }
+
+    public record DadosFechamentoContrato
+    {
+        public int pkDoctoped { get; init; }
+        public int operador { get; init; }
+        public string temProfissional { get; init; }
     }
 
     public record ResponseData
@@ -287,6 +297,47 @@ public class UserController:ControllerBase
         try
         {
             var result = await _cadastroOr.CadastrarNovaEc(informacoesEc);
+            Console.WriteLine(result);
+            return Ok(new ResponseData
+            {
+                status = 200,
+                message = "OK",
+                data = result
+            });
+        }
+        catch (HttpRequestException e)
+        {
+            Console.WriteLine(e);
+
+            return StatusCode(
+                (int?)e.StatusCode ?? 500,
+                new ResponseData
+                {
+                    status = (int?)e.StatusCode ?? 500,
+                    message = e.Message
+                });
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+
+            return StatusCode(
+                500,
+                new ResponseData
+                {
+                    status = 500,
+                    message = e.InnerException?.Message ?? e.Message
+                }
+            );
+        }
+    }
+
+    [HttpPost("fechar-orcamento")]
+    public async Task<IActionResult> FecharOrcamento([FromBody] DadosFechamentoContrato dadosFechamentoContrato)
+    {
+        try
+        {
+            var result = await _geracaoContrato.FecharOrcamento(dadosFechamentoContrato.pkDoctoped, dadosFechamentoContrato.operador, dadosFechamentoContrato.temProfissional);
             Console.WriteLine(result);
             return Ok(new ResponseData
             {

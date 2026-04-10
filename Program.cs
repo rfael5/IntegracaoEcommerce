@@ -24,6 +24,7 @@ builder.Services.AddScoped<UsuariosTPA>();
 builder.Services.AddScoped<CadastroPedido>();
 builder.Services.AddScoped<ProdutosTPA>();
 builder.Services.AddScoped<Ajustes>();
+builder.Services.AddScoped<GeracaoContrato>();
 builder.Services.AddControllers();
 
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
