@@ -24,6 +24,7 @@ public class PrincipalDbContext : DbContext
     public DbSet<TabelaPreco> TabelasPreco { get; set; }
     public DbSet<CategoriaEvento> CategoriasEvento { get; set; }
     public DbSet<EventoTp> EventoTps { get; set; }
+    public DbSet<EventoTpSv> EventoTpSv { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

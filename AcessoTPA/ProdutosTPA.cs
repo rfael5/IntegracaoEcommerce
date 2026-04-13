@@ -270,4 +270,33 @@ public class ProdutosTPA
         };
     }
 
+    public async Task<List<EventoTpSv>> GetTiposServicos()
+    {
+        const string _query = $@"
+            SELECT 
+                ID, 
+                PK_EVENTOTPSV, 
+                RDX_EVENTOTP,
+                DESCRICAO, 
+                SEQUENCIA, 
+                TPIMPRESSAO, 
+                TOTALIZADOR, 
+                QUANTIDADE, 
+                CONVIDADOS 
+                STATUS, 
+                IDX_EVENTOSV,
+                TPIMPRESSAOTOT, 
+                TPIMPRESSAOIMG, 
+                TPREGISTROITENS, 
+                VARIEDADESUGERIDA, 
+                PERMISSAO, 
+                CALCCONVIDADO,
+                IDX_IMG 
+            FROM TPAEVENTOTPSV
+        ";
+
+        var tiposServicos = await _dbPrincipal.EventoTpSv.FromSqlRaw(_query).ToListAsync();
+        return tiposServicos;
+    }
+
 }

@@ -28,3 +28,4 @@ public record CategoriaEvento
     [Column("ESCALAALERTA")]
     public string? escalaAlerta { get; init; }
 }
+
