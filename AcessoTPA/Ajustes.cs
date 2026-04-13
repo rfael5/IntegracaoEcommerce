@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -5,10 +6,12 @@ using Microsoft.EntityFrameworkCore;
 public class Ajustes
 {
     private readonly AppDbContext _context;
+    private readonly GeracaoContrato _contratos;
 
-    public Ajustes(AppDbContext context)
+    public Ajustes(AppDbContext context, GeracaoContrato contratos)
     {
         _context = context;
+        _contratos = contratos;
     }
 
     public async Task<int> CriarPkAjustePed()
@@ -101,5 +104,166 @@ public class Ajustes
             throw;
         }
     }
+
+    public async Task<int> CriarAdendoContrato(DadosContratoAdendo dadosAdendo)
+    {
+        var adendo = new TpaContratoAdendoDTO
+        {
+            rdxContrato = dadosAdendo.idContrato,
+            adendo = dadosAdendo.adendo,
+            descricao = dadosAdendo.descricaoAjuste,
+            opInc = dadosAdendo.operador,
+            opAlt = dadosAdendo.operador,
+            idxTabela = dadosAdendo.idAjuste,
+            opAtivacao = dadosAdendo.operador
+        };
+
+        _context.ContratosAdendos.Add(adendo);
+        await _context.SaveChangesAsync();
+        await _context.Entry(adendo).ReloadAsync();
+        Console.WriteLine(JsonSerializer.Serialize(adendo));
+        return adendo.pkContratoAdendo;
+    }
+
+    public async Task AtualizarContratoMov(DadosContratoAdendo dadosAdendo, int idxContratoAdendo)
+    {
+        var totalDocto = await _context.ContratoMov
+            .Where(d => d.pkContratoMov == dadosAdendo.pkContratoMov )
+            .Select(d => d.totalDocto)
+            .SingleAsync();
+        
+        var novoValorDocto = totalDocto + dadosAdendo.valorAjuste;
+        
+        var dataAtual = BrazilTime.Now();
+        const string _query = $@"
+            UPDATE TPACONTRATOMOV
+                SET TOTALDOCTO = @totalDocto,
+                DTALT = @dataAtual,
+                OPALT = @operador,
+                IDX_CONTRATOADENDO = @idxContratoAdendo
+            WHERE PK_CONTRATOMOV = @pkContratoMov";
+        
+        await _context.Database.ExecuteSqlRawAsync(
+            _query,
+            new SqlParameter("totalDocto", novoValorDocto),
+            new SqlParameter("dataAtual", dataAtual),
+            new SqlParameter("operador", dadosAdendo.operador),
+            new SqlParameter("idxContratoAdendo", idxContratoAdendo),
+            new SqlParameter("pkContratoMov", dadosAdendo.pkContratoMov));
+    }
+
+    // public async Task AtualizarEventoOrc(int idEventoOrc)
+    // {
+    //     const string _query = @$"
+    //         UPDATE TPAEVENTOORC
+    //             SET OPCOMPRA = 'R',
+    //             ASSOCIAMATERIAL='S'
+    //         WHERE ID = @idEventoOrc
+    //     ";
+
+    //     await _context.Database.ExecuteSqlRawAsync(_query, new SqlParameter("idEventoOrc", idEventoOrc));
+    // }
+
+    public async Task InserirHistorico(DadosContratoAdendo dadosAdendo)
+    {
+         var doctopedHistorico = new TpaDoctopedHistoricoDTO
+        {
+            rdxDoctoped = dadosAdendo.idDoctoped,
+            etapa = "T",
+            parcial = "N",
+            situacao = "A",
+            texto = $"CONTRATO;{dadosAdendo.adendo}",
+            dtInc = BrazilTime.Now(),
+            opInc = dadosAdendo.operador,
+        };
+
+        _context.DoctopedHistorico.Add(doctopedHistorico);
+    }
+
+    public async Task TornarAjusteVigente(int idAjuste, int operador)
+    {
+        var now = BrazilTime.Now();
+        const string _query = @$"
+            UPDATE TPAAJUSTEPED
+                SET SITUACAO = 'V',
+                DTALT = @now,
+                OPALT = @operador
+            WHERE PK_AJUSTEPED = @idAjuste
+        ";
+
+        await _context.Database.ExecuteSqlRawAsync(
+            _query,
+            new SqlParameter("now", now),
+            new SqlParameter("operador", operador),
+            new SqlParameter("idAjuste", idAjuste));
+    }
+
+    public async Task<List<InfoMovtopedContratoItem>> BuscarProdutosAjuste(int idAjuste)
+    {
+        const string _query = @$"
+            SELECT M.PK_MOVTOPED AS pkMovtoped, M.IDX_PRODUTO AS idxProduto, A.QUANTIDADE AS l_quantidade, A.PRECO AS l_precouni, 
+            M.L_VALORBEM AS l_valorbem, M.IDX_PATRIMONIO AS idxPatrimonio, M.IDX_PATRIMONIOMOVTO AS idxPatrimonioMovto, M.REFERENCIA AS referencia,
+            M.TIPOPROD AS tipoProd, M.LOCACAO AS locacao, M.UNIDADE AS unidade, M.LOCACAOBP AS locacaoBp, M.L_P AS l_p, M.CODPRODUTO AS codProduto
+            FROM TPAAJUSTEPEDITEM AS A
+                INNER JOIN TPAMOVTOPED AS M ON A.IDX_MOVTOPED = M.PK_MOVTOPED
+            WHERE RDX_AJUSTEPED = @idAjuste";
+        
+        var produtos = await _context.AjustePedItem
+        .Where(ajuste => ajuste.rdxAjustePed == idAjuste)
+        .Join(
+            _context.Movtoped, 
+            ajuste => ajuste.pkAjustePedItem, 
+            movtoped => movtoped.pkMovtoped,
+            (ajuste, movtoped) => new InfoMovtopedContratoItem {
+                pkMovtoped = movtoped.pkMovtoped, 
+                idxProduto = movtoped.idxProduto,
+                l_quantidade = (decimal)ajuste.quantidade, 
+                l_precototal = (decimal)ajuste.preco, 
+                l_valorbem = movtoped.l_valorbem,
+                idxPatrimonio = movtoped.idxPatrimonio, 
+                idxPatrimonioMovto = movtoped.idxPatrimonioMovto, 
+                referencia = movtoped.referencia, 
+                tipoProd = movtoped.tipoProd, 
+                locacao = movtoped.locacao, 
+                unidade = movtoped.unidade, 
+                locacaoBp = movtoped.locacaoBp, 
+                l_p = movtoped.l_p, 
+                codProduto = movtoped.codProduto})
+        .ToListAsync();
+
+        return produtos;
+                    
+    }
+
+    public async Task<int> AutorizarAjuste(DadosContratoAdendo dadosAdendo)
+    {
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            var idAdendo = await CriarAdendoContrato(dadosAdendo);
+            var produtos = await BuscarProdutosAjuste(Convert.ToInt32(dadosAdendo.idAjuste));
+            foreach(var item in produtos)
+            {
+                await _contratos.CriarContratoItem(item, dadosAdendo.pkContratoMov, dadosAdendo.operador, idxContratoAdendo:idAdendo);
+            }
+
+            await AtualizarContratoMov(dadosAdendo, idAdendo);
+            await TornarAjusteVigente(Convert.ToInt32(dadosAdendo.idAjuste), dadosAdendo.operador);
+            await InserirHistorico(dadosAdendo);
+
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+            return idAdendo;
+        }
+        catch (Exception e)
+        {
+            await transaction.RollbackAsync();
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+    
+    
 
 }

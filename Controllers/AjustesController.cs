@@ -47,4 +47,38 @@ public class AjustesController:ControllerBase
             });
         }
     }
+
+    [HttpPost("autorizar-ajuste")]
+    public async Task<IActionResult> AutorizarAjuste([FromBody] DadosContratoAdendo dadosAdendo)
+    {
+        try
+        {
+            var result = await _ajustesService.AutorizarAjuste(dadosAdendo);
+            return Ok(new ResponseData {
+                status = 200,
+                message = "OK",
+                data = result
+            });
+        }
+        catch(HttpRequestException e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(
+                (int?)e.StatusCode ?? 500,
+                new ResponseData
+                {
+                    status = (int?)e.StatusCode ?? 500,
+                    message = e.Message
+                });
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(500, new ResponseData
+            {
+                status = 500,
+                message = e.InnerException?.Message ?? e.Message
+            });
+        }
+    }
 }

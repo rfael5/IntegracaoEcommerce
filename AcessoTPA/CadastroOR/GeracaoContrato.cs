@@ -69,7 +69,7 @@ public class GeracaoContrato
         return novoContratoMov.pkContratoMov;
     }
     
-    private async Task CriarContratoItem(InfoMovtopedContratoItem movtoped, int pkContratoMov, int operador)
+    public async Task CriarContratoItem(InfoMovtopedContratoItem movtoped, int pkContratoMov, int operador, int idxContratoAdendo = 0)
     {
         var novoItem = new TpaContratoItemDTO
         {
@@ -148,7 +148,7 @@ public class GeracaoContrato
             rdxDoctoped = pkDoctoped,
             etapa = "T",
             parcial = "N",
-            situacao = "A",
+            situacao = "I",
             texto = "CONTRATO;SITUACAO",
             dtInc = BrazilTime.Now(),
             opInc = operador,
@@ -189,7 +189,6 @@ public class GeracaoContrato
                     l_valorbem = m.l_valorbem,
                     idxPatrimonio = m.idxPatrimonio,
                     idxPatrimonioMovto = m.idxPatrimonioMovto,
-                    descricao = m.descricao,
                     referencia = m.referencia,
                     tipoProd = m.tipoProd,
                     locacao = m.locacao,
@@ -209,23 +208,6 @@ public class GeracaoContrato
             await SetarSituacaoMovtopedAutorizado(pkDoctoped, operador);
             await SetarSituacaoDoctopedVigente(pkDoctoped, contratoMov, operador, temProfissional);
             await InserirHistorico(pkDoctoped, operador);
-
-            var lines = new List<string>();
-
-            foreach (var entry in _context.ChangeTracker.Entries())
-            {
-                Console.WriteLine($"Entity: {entry.Entity.GetType().Name}");
-                lines.Add($"Entity: {entry.Entity.GetType().Name}");
-
-                foreach (var prop in entry.Properties)
-                {
-                    var value = prop.CurrentValue?.ToString();
-                    Console.WriteLine($"  {prop.Metadata.Name}: {value} (Length: {value?.Length})");
-                    lines.Add($"  {prop.Metadata.Name}: {value} (Length: {value?.Length})");
-                }
-            }
-
-            File.WriteAllLines("debug_log.txt", lines);
 
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
