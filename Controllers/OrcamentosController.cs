@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.EntityFrameworkCore;
 
 [ApiController]
 [ApiKey]
@@ -9,15 +10,18 @@ public class OrcamentosController:ControllerBase
     private readonly AcessoTPA _acessoTpa;
     private readonly GeracaoContrato _geracaoContrato;
     private readonly CadastroPedido _cadastroPedido;
+    private readonly AppDbContext _context;
 
     public OrcamentosController(
         AcessoTPA acessoTpa, 
         GeracaoContrato geracaoContrato,
-        CadastroPedido cadastroPedido)
+        CadastroPedido cadastroPedido,
+        AppDbContext context)
     {
         _acessoTpa = acessoTpa;
         _geracaoContrato = geracaoContrato;
         _cadastroPedido = cadastroPedido;
+        _context = context;
     }
 
     public record DadosFechamentoContrato
@@ -38,6 +42,16 @@ public class OrcamentosController:ControllerBase
         public int status { get; init; }
         public string message { get; init; }
         public object? data  { get; init; } = null;
+    }
+
+    public async Task<bool> ChecarDocumentoExiste(int pkDoctoped)
+    {
+        var documento = await _context.Doctoped.FirstOrDefaultAsync(doc => doc.pkDoctoped == pkDoctoped);
+        if(documento == null)
+        {
+            return false;
+        }
+        return true;
     }
 
      [HttpPost("criar-or")]
@@ -130,6 +144,18 @@ public class OrcamentosController:ControllerBase
     {
         try
         {
+            var documentoExiste = await ChecarDocumentoExiste(dadosFechamentoContrato.pkDoctoped);
+            if(!documentoExiste)
+            {
+                return StatusCode(
+
+                    500,
+                    new ResponseData
+                    {
+                        status = 500,
+                        message = "OR/EC não encontrados no banco."
+                    });
+            }
             var result = await _geracaoContrato.GerarContrato(dadosFechamentoContrato.pkDoctoped, dadosFechamentoContrato.operador, dadosFechamentoContrato.temProfissional);
             Console.WriteLine(result);
             return Ok(new ResponseData
@@ -171,6 +197,17 @@ public class OrcamentosController:ControllerBase
     {
         try
         {
+            var documentoExiste = await ChecarDocumentoExiste(requestData.pkDoctoped);
+            if(!documentoExiste)
+            {
+                return StatusCode(
+                    500,
+                    new ResponseData
+                    {
+                        status = 500,
+                        message = "OR/EC não encontrados no banco."
+                    });
+            }
             await _acessoTpa.CancelarDocumento(requestData.pkDoctoped, requestData.operador);
             return Ok(new ResponseData
             {
