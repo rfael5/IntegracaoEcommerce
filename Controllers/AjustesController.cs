@@ -13,6 +13,8 @@ public class AjustesController:ControllerBase
         _ajustesService = ajustesService;
     }
 
+ 
+
     [EnableCors("All")]
     [HttpPost("criar-ajuste")]
     public async Task<IActionResult> CriarAjuste([FromBody] InformacoesAjuste ajuste)
@@ -49,11 +51,11 @@ public class AjustesController:ControllerBase
     }
 
     [HttpPost("autorizar-ajuste")]
-    public async Task<IActionResult> AutorizarAjuste([FromBody] DadosContratoAdendo dadosAdendo)
+    public async Task<IActionResult> AutorizarAjuste([FromBody] RequestAdendo requestAdendo)
     {
         try
         {
-            var result = await _ajustesService.AutorizarAjuste(dadosAdendo);
+            var result = await _ajustesService.AutorizarAjuste(requestAdendo);
             return Ok(new ResponseData {
                 status = 200,
                 message = "OK",

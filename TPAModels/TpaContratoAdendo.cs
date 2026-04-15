@@ -36,5 +36,5 @@ public record TpaContratoAdendoDTO
     [Column("DISTRATO")]
     public string? distrato { get; init; } = "N";
     [Column("IDX_TABELAAUX")]
-    public string idxTabelaAux { get; init; }
+    public string? idxTabelaAux { get; init; }
 }

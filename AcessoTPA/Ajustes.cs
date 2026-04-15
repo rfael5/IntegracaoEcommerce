@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using Azure.Core;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
@@ -198,7 +199,30 @@ public class Ajustes
             new SqlParameter("idAjuste", idAjuste));
     }
 
-    public async Task<List<InfoMovtopedContratoItem>> BuscarProdutosAjuste(int idAjuste)
+    public async Task<DadosContratoAdendo> BuscarDadosAdendo(RequestAdendo requestAdendo)
+    {
+        var dadosAdendo = await _context.AjustePed
+            .Where(ajuste => ajuste.pkAjustePed == requestAdendo.idAjuste)
+            .Join(_context.ContratoMov,
+            ajuste => ajuste.rdxDoctoped,
+            contratoMov => contratoMov.idxDoctoEst,
+            (ajuste, contratoMov) => new DadosContratoAdendo
+            {
+                idContrato = (int)contratoMov.rdxContrato,
+                adendo = requestAdendo.descricaoAdendo,
+                descricaoAjuste = ajuste.descricao,
+                operador = requestAdendo.operador,
+                valorAjuste = (decimal)ajuste.totalValor,
+                pkContratoMov = contratoMov.pkContratoMov,
+                associaMaterial = requestAdendo.associaMaterial,
+                idAjuste = Convert.ToString(ajuste.pkAjustePed),
+                idDoctoped = (int)ajuste.rdxDoctoped
+            }).SingleAsync();   
+        
+        return dadosAdendo;
+    }
+
+    public async Task<List<InfoMovtopedContratoItem>> BuscarProdutosAjuste(int idAjuste, int rdxContratoMov)
     {
         const string _query = @$"
             SELECT M.PK_MOVTOPED AS pkMovtoped, M.IDX_PRODUTO AS idxProduto, A.QUANTIDADE AS l_quantidade, A.PRECO AS l_precouni, 
@@ -208,17 +232,22 @@ public class Ajustes
                 INNER JOIN TPAMOVTOPED AS M ON A.IDX_MOVTOPED = M.PK_MOVTOPED
             WHERE RDX_AJUSTEPED = @idAjuste";
         
+        var ultimoItem = await _context.ContratoItem.Where(produto => produto.rdxContratoMov == rdxContratoMov).MaxAsync(produto => produto.item);
+
+        Console.WriteLine($"ULTIMO ITEM: {ultimoItem}");
+        
         var produtos = await _context.AjustePedItem
         .Where(ajuste => ajuste.rdxAjustePed == idAjuste)
         .Join(
             _context.Movtoped, 
-            ajuste => ajuste.pkAjustePedItem, 
+            ajuste => ajuste.idxMovtoped, 
             movtoped => movtoped.pkMovtoped,
             (ajuste, movtoped) => new InfoMovtopedContratoItem {
                 pkMovtoped = movtoped.pkMovtoped, 
                 idxProduto = movtoped.idxProduto,
                 l_quantidade = (decimal)ajuste.quantidade, 
                 l_precototal = (decimal)ajuste.preco, 
+                item = ultimoItem + movtoped.item,
                 l_valorbem = movtoped.l_valorbem,
                 idxPatrimonio = movtoped.idxPatrimonio, 
                 idxPatrimonioMovto = movtoped.idxPatrimonioMovto, 
@@ -235,13 +264,14 @@ public class Ajustes
                     
     }
 
-    public async Task<int> AutorizarAjuste(DadosContratoAdendo dadosAdendo)
+    public async Task<int> AutorizarAjuste(RequestAdendo requestAdendo)
     {
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
+            var dadosAdendo = await BuscarDadosAdendo(requestAdendo);
             var idAdendo = await CriarAdendoContrato(dadosAdendo);
-            var produtos = await BuscarProdutosAjuste(Convert.ToInt32(dadosAdendo.idAjuste));
+            var produtos = await BuscarProdutosAjuste(Convert.ToInt32(dadosAdendo.idAjuste), dadosAdendo.pkContratoMov);
             foreach(var item in produtos)
             {
                 await _contratos.CriarContratoItem(item, dadosAdendo.pkContratoMov, dadosAdendo.operador, idxContratoAdendo:idAdendo);
@@ -262,8 +292,5 @@ public class Ajustes
             throw;
         }
     }
-
-    
-    
 
 }

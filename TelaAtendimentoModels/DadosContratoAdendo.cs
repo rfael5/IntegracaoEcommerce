@@ -10,3 +10,11 @@ public record DadosContratoAdendo
     public string idAjuste { get; init; }
     public int idDoctoped { get; init; }
 }
+
+public record RequestAdendo
+{
+    public int idAjuste { get; init; }
+    public string descricaoAdendo { get; init; }
+    public string associaMaterial { get; init; }
+    public int operador { get; init; }
+}
