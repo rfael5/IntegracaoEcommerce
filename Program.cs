@@ -19,6 +19,7 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddScoped<AcessoEcommerce>();
+builder.Services.AddScoped<IntegracaoTray>();
 builder.Services.AddScoped<AcessoTPA>();
 builder.Services.AddScoped<UsuariosTPA>();
 builder.Services.AddScoped<CadastroPedido>();
