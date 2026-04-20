@@ -51,11 +51,12 @@ public class AjustesController:ControllerBase
     }
 
     [HttpPost("autorizar-ajuste")]
-    public async Task<IActionResult> AutorizarAjuste([FromBody] RequestAdendo requestAdendo)
+    public async Task<IActionResult> AutorizarAjuste([FromBody] InformacoesAjuste requestAdendo)
     {
         try
         {
-            var result = await _ajustesService.AutorizarAjuste(requestAdendo);
+            //var result = await _ajustesService.AutorizarAjuste(requestAdendo);
+            var result = await _ajustesService.CadastrarAjusteGerarAdendoContrato(requestAdendo);
             return Ok(new ResponseData {
                 status = 200,
                 message = "OK",

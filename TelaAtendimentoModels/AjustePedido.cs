@@ -7,4 +7,6 @@ public record AjustePedido
     public decimal totalValor { get; init; } //total valor ajuste
     public string? obs { get; init; } //observações sobre o ajuste - campo não obrigatório.
     public int operador { get; init; } //id do usuário no TPA
+    public string descricaoAdendo { get; init; } // nome adendo
+    public string associaMaterial { get; init; }
 }

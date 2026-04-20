@@ -199,22 +199,22 @@ public class Ajustes
             new SqlParameter("idAjuste", idAjuste));
     }
 
-    public async Task<DadosContratoAdendo> BuscarDadosAdendo(RequestAdendo requestAdendo)
+    public async Task<DadosContratoAdendo> BuscarDadosAdendo(AjustePedido request, int idAjuste)
     {
         var dadosAdendo = await _context.AjustePed
-            .Where(ajuste => ajuste.pkAjustePed == requestAdendo.idAjuste)
+            .Where(ajuste => ajuste.pkAjustePed == idAjuste)
             .Join(_context.ContratoMov,
             ajuste => ajuste.rdxDoctoped,
             contratoMov => contratoMov.idxDoctoEst,
             (ajuste, contratoMov) => new DadosContratoAdendo
             {
                 idContrato = (int)contratoMov.rdxContrato,
-                adendo = requestAdendo.descricaoAdendo,
+                adendo = request.descricaoAdendo,
                 descricaoAjuste = ajuste.descricao,
-                operador = requestAdendo.operador,
+                operador = request.operador,
                 valorAjuste = (decimal)ajuste.totalValor,
                 pkContratoMov = contratoMov.pkContratoMov,
-                associaMaterial = requestAdendo.associaMaterial,
+                associaMaterial = request.associaMaterial,
                 idAjuste = Convert.ToString(ajuste.pkAjustePed),
                 idDoctoped = (int)ajuste.rdxDoctoped
             }).SingleAsync();   
@@ -264,12 +264,12 @@ public class Ajustes
                     
     }
 
-    public async Task<int> AutorizarAjuste(RequestAdendo requestAdendo)
+    public async Task<int> AutorizarAjuste(AjustePedido requestAdendo, int idAjuste)
     {
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
-            var dadosAdendo = await BuscarDadosAdendo(requestAdendo);
+            var dadosAdendo = await BuscarDadosAdendo(requestAdendo, idAjuste);
             var idAdendo = await CriarAdendoContrato(dadosAdendo);
             var produtos = await BuscarProdutosAjuste(Convert.ToInt32(dadosAdendo.idAjuste), dadosAdendo.pkContratoMov);
             foreach(var item in produtos)
@@ -288,6 +288,69 @@ public class Ajustes
         catch (Exception e)
         {
             await transaction.RollbackAsync();
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+    /// /////////////////////////////////////////////////////////////////////
+    /// CADASTRAR E GERAR CONTRATO NA MESMA FUNÇÃO
+    /// ////////////////////////////////////////////////////////////////////
+    /// /// ////////////////////////////////////////////////////////////////
+    /// ////////////////////////////////////////////////////////////////////
+    /// ////////////////////////////////////////////////////////////////////
+    /// 
+    
+    public async Task<int> CadastrarAjusteGerarAdendoContrato(InformacoesAjuste ajuste)
+    {
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            var ajustePed = await CriarAjustePed(ajuste.ajustePedido);
+            foreach(var item in ajuste.itensAjuste)
+            {
+                var ajusteItem = await CriarAjustePedItem(item, ajustePed.pkAjustePed);
+                _context.AjustePedItem.Add(ajusteItem);
+            }
+
+            var pkDoctoped = Convert.ToInt32(ajuste.ajustePedido.rdxDoctoped);
+            await AtualizarTotalAjusteDoctoped(pkDoctoped, ajuste.ajustePedido.totalValor);
+
+            await _context.SaveChangesAsync();
+            await AutorizarAdendoAposCriacaoAjuste(ajuste.ajustePedido, ajustePed.pkAjustePed);
+            await transaction.CommitAsync();
+            return ajustePed.pkAjustePed;
+        }
+        catch(Exception e)
+        {
+            await transaction.RollbackAsync();
+            Console.WriteLine(e);
+            Console.WriteLine(JsonSerializer.Serialize(ajuste));
+            throw;
+        }
+    }
+
+    public async Task<int> AutorizarAdendoAposCriacaoAjuste(AjustePedido requestAdendo, int idAjuste)
+    {
+        try
+        {
+            var dadosAdendo = await BuscarDadosAdendo(requestAdendo, idAjuste);
+            var idAdendo = await CriarAdendoContrato(dadosAdendo);
+            var produtos = await BuscarProdutosAjuste(Convert.ToInt32(dadosAdendo.idAjuste), dadosAdendo.pkContratoMov);
+            foreach(var item in produtos)
+            {
+                await _contratos.CriarContratoItem(item, dadosAdendo.pkContratoMov, dadosAdendo.operador, idxContratoAdendo:idAdendo);
+            }
+
+            await AtualizarContratoMov(dadosAdendo, idAdendo);
+            await TornarAjusteVigente(Convert.ToInt32(dadosAdendo.idAjuste), dadosAdendo.operador);
+            await InserirHistorico(dadosAdendo);
+
+            await _context.SaveChangesAsync();
+            return idAdendo;
+        }
+        catch (Exception e)
+        {
             Console.WriteLine(e);
             throw;
         }
