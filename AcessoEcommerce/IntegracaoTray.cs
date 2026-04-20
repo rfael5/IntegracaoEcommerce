@@ -7,8 +7,8 @@ public class IntegracaoTray
         private readonly string consumer_key = "a75943d6601451a79a1d80b8b6eb3ccd32fcf9d3e7fa2c39ad32010180e9a0ac";
         private readonly string consumer_secret = "5706705aba4d2cf32d6024adf9878926799f6ad4e777d5ebc5eafb41850db83a";
         private readonly string code = "7690ae9e20502a84af649f187a54a8203daa140aab2491eda027a79f3d8504b9";
-        private string access_token = "APP_ID-8289-STORE_ID-1471881-8dbc24b1cafabf9418a201bdc9dc9e1c2ae79b3204ad4bded299a86bcb77a4c3";
-        private string refresh_token = "aa444a84d39a43c4027f54de34e18296edebb15f88eea4441bd60ca65f8e1ec0";
+        private string access_token = "APP_ID-8289-STORE_ID-1471881-8b4ac12f5ecbf2e5b3b07c702f1fdb37109c01ac9763635f1f82a59ed843f0bd";
+        private string refresh_token = "d33dc23527b0a6224640aedeebbe74e0c289392fac5c6290651c3e02c21a76df";
 
         public readonly AcessoTPA _acessoTpa;
 
@@ -86,9 +86,10 @@ public class IntegracaoTray
                 Console.WriteLine(completeOrder);
                 Console.WriteLine("###############");
                 await CriarPedido(completeOrder);
+                //AtualizarStatusProntoEnvio(id);
                 try
                 {
-                    AtualizarStatusProntoEnvio(id);
+                    await AtualizarStatusProntoEnvio(id);
                 }
                 catch (Exception ex)
                 {
@@ -226,23 +227,34 @@ public class IntegracaoTray
         return listaProdutos;
     }
 
-    private void AtualizarStatusProntoEnvio(string orderId)
+    private async Task AtualizarStatusProntoEnvio(string orderId)
     {
-        var request = new RestClient($"{api_address}/orders/{orderId}?access_token={access_token}");
-        var requestParameters = new RestRequest()
-            .AddParameter("[\"Order\"][\"status_id\"]", "1")
-            .AddParameter("[\"Order\"][\"taxes\"]", "0.01")
-            .AddParameter("[\"Order\"][\"shipment\"]", "Sedex")
-            .AddParameter("[\"Order\"][\"shipment_value\"]", "5.58")
-            .AddParameter("[\"Order\"][\"discount\"]", "0.01")
-            .AddParameter("[\"Order\"][\"sending_code\"]", "123456")
-            .AddParameter("[\"Order\"][\"sending_date\"]", "2015-04-20")
-            .AddParameter("[\"Order\"][\"store_note\"]", "Pedido em 1 vez de R$ 51,85 através do Boleto.")
-            .AddParameter("[\"Order\"][\"customer_note\"]", "11")
-            .AddParameter("[\"Order\"][\"partner_id\"]", "2");
+        try
+        {
+            var request = new RestClient($"{api_address}/orders/{orderId}?access_token={access_token}");
+            var requestParameters = new RestRequest()
+                .AddParameter("Order[status_id]", "353");
 
-        var orderResponse = request.Put(requestParameters);
+            var orderResponse = request.Put(requestParameters);
 
-        Console.WriteLine(orderResponse);
+            Console.WriteLine(orderResponse.Content);
+
+            // var client = new RestClient(api_address);
+            // var request = new RestRequest($"/orders/{orderId}", Method.Put);
+
+            // request.AddQueryParameter("access_token", access_token);
+            // request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
+
+            // request.AddParameter("Order[status_id]", "1");
+
+            // var response = client.Execute(request);
+
+            // Console.WriteLine(response.Content);
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 }

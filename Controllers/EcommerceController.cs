@@ -54,4 +54,5 @@ public class EcommerceController : ControllerBase
         var customers = await _integracao.GetCustomers();
         return Ok(customers);
     }
+
 }
