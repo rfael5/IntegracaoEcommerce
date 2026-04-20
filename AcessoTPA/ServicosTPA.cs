@@ -20,7 +20,7 @@ public class ServicosTPA
         return categorias;
     }
 
-    public async Task<List<EventoTp>> GetTipos()
+    public async Task<List<EventoTp>> GetTiposServico()
     {
         const string _query = $@"SELECT ID, PK_EVENTOTP, DESCRICAO, STATUS, OBS FROM TPAEVENTOTP";
         var tipos = await _dbPrincipal.EventoTps.FromSqlRaw(_query).ToListAsync();

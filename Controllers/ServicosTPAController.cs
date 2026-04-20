@@ -12,12 +12,12 @@ public class ServicosTPAController:ControllerBase
         _servicos = servicos;
     }
 
-    [HttpGet("evento-tp")]
+    [HttpGet("tipos-servico")]
     public async Task<IActionResult> BuscarTipos()
     {
         try
         {
-            var tipos = await _servicos.GetTipos();
+            var tipos = await _servicos.GetTiposServico();
             return Ok(tipos);
         }
         catch (Exception e)
@@ -26,6 +26,7 @@ public class ServicosTPAController:ControllerBase
             return Ok(new { message = e.Message });
         }
     }
+
     [HttpGet("categorias-evento")]
     public async Task<IActionResult> BuscarCategoriasEvento()
     {

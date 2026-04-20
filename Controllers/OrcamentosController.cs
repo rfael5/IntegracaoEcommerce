@@ -54,6 +54,45 @@ public class OrcamentosController:ControllerBase
         return true;
     }
 
+    [HttpPost("autorizar-or")]
+    public async Task<IActionResult> AutorizarOr([FromBody] InformacoesOR informacoesOr)
+    {
+        try
+        {
+            var result = await _cadastroPedido.CadastrarEGerarContrato(informacoesOr);
+
+            return Ok(new ResponseData
+            {
+                status = 200,
+                message = "OK",
+                data = result
+            });
+        }
+        catch (HttpRequestException e)
+        {
+            Console.WriteLine(e);
+
+            return StatusCode(
+                (int?)e.StatusCode ?? 500,
+                new ResponseData
+                {
+                    status = (int?)e.StatusCode ?? 500,
+                    message = e.Message
+                });
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+
+            return StatusCode(500, new ResponseData
+            {
+                status = 500,
+                message = e.InnerException?.Message ?? e.Message
+            });
+        }
+    }
+    
+
      [HttpPost("criar-or")]
     public async Task<IActionResult> CriarOr([FromBody] InformacoesOR informacoesOr)
     {

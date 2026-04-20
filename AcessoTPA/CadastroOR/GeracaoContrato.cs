@@ -221,4 +221,63 @@ public class GeracaoContrato
         }
     } 
 
+    public async Task<int> GerarContratoAposCriacao(int pkDoctoped, int operador, string temProfissional)
+    {
+        try
+        {
+
+            var doctoped = await _context.Doctoped
+                .Where(d => d.pkDoctoped == pkDoctoped)
+                .Select((d) => new { d.pkDoctoped, d.documento, d.idxEntidade, d.idxTabela, d.idxTabelaSub, d.totalDocto })
+                .SingleAsync();
+            
+            var contrato = await CriarContrato(doctoped, operador);
+            int pkContrato = (int)contrato.pkContrato;
+            DateTime dataCriacaoContrato = (DateTime)contrato.dtInc;
+
+            var contratoMov = await CriarContratoMov(doctoped, pkContrato, dataCriacaoContrato, operador);
+
+            var movtoped = await _context.Movtoped
+                .Where(m => m.rdxDoctoped == pkDoctoped)
+                .Select(m => new InfoMovtopedContratoItem
+                {
+                    pkMovtoped = m.pkMovtoped,
+                    item = m.item,
+                    idxProduto = m.idxProduto,
+                    l_quantidade = m.l_quantidade,
+                    l_precouni = m.l_precouni,
+                    l_precototal = m.l_precototal,
+                    l_valorbem = m.l_valorbem,
+                    idxPatrimonio = m.idxPatrimonio,
+                    idxPatrimonioMovto = m.idxPatrimonioMovto,
+                    referencia = m.referencia,
+                    tipoProd = m.tipoProd,
+                    locacao = m.locacao,
+                    unidade = m.unidade,
+                    locacaoBp = m.locacaoBp,
+                    l_p = m.l_p,
+                    codProduto = m.codProduto
+                })
+                .ToListAsync();
+
+
+            foreach (var item in movtoped)
+            {
+                await CriarContratoItem(item, contratoMov, operador);
+            }
+
+            await SetarSituacaoMovtopedAutorizado(pkDoctoped, operador);
+            await SetarSituacaoDoctopedVigente(pkDoctoped, contratoMov, operador, temProfissional);
+            await InserirHistorico(pkDoctoped, operador);
+
+            await _context.SaveChangesAsync();
+            return pkContrato;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    } 
+
 }
