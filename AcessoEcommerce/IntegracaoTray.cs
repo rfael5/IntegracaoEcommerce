@@ -7,8 +7,15 @@ public class IntegracaoTray
         private readonly string consumer_key = "a75943d6601451a79a1d80b8b6eb3ccd32fcf9d3e7fa2c39ad32010180e9a0ac";
         private readonly string consumer_secret = "5706705aba4d2cf32d6024adf9878926799f6ad4e777d5ebc5eafb41850db83a";
         private readonly string code = "7690ae9e20502a84af649f187a54a8203daa140aab2491eda027a79f3d8504b9";
-        private string access_token = "APP_ID-8289-STORE_ID-1471881-67b15acdbdcbdc319b0d4fbab1dee9a8974897a723fecaff3200c6f26f7f224b";
-        private string refresh_token = "cdc76ad6c0e79c66d6621ed9b433ac535d7b082961a1ab03a6411a512f4cf28b";
+        private string access_token = "APP_ID-8289-STORE_ID-1471881-8dbc24b1cafabf9418a201bdc9dc9e1c2ae79b3204ad4bded299a86bcb77a4c3";
+        private string refresh_token = "aa444a84d39a43c4027f54de34e18296edebb15f88eea4441bd60ca65f8e1ec0";
+
+        public readonly AcessoTPA _acessoTpa;
+
+        public IntegracaoTray(AcessoTPA acessoTpa)
+        {
+            _acessoTpa = acessoTpa;
+        }
 
         public async Task<string?> Authorize()
         {
@@ -60,7 +67,7 @@ public class IntegracaoTray
 
     public async Task<string> GetOrders()
     {
-        var request = new RestClient($"{api_address}/orders?status=PENDENTE");
+        var request = new RestClient($"{api_address}/orders?status=PRODUCAO");
         var orderRequests = new RestRequest()
             .AddParameter("access_token", access_token);
         var orderResponse = request.Get(orderRequests);
@@ -73,10 +80,33 @@ public class IntegracaoTray
         foreach(var teste in orders.EnumerateArray())
         {
             var id = teste.GetProperty("Order").GetProperty("id").GetString();
-            var completeOrder = await GetCompleteOrder(Convert.ToInt32(id));
-            Console.WriteLine(completeOrder);
-            Console.WriteLine("###############");
-            //await CriarPedido(completeOrder);
+            try
+            {
+                var completeOrder = await GetCompleteOrder(Convert.ToInt32(id));
+                Console.WriteLine(completeOrder);
+                Console.WriteLine("###############");
+                await CriarPedido(completeOrder);
+                try
+                {
+                    AtualizarStatusProntoEnvio(id);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Pedido {id} salvo no ERP, mas falhou ao atualizar no Wordpress.");
+                    Console.WriteLine(ex);
+                    throw;
+                }
+            }
+            catch(InvalidOperationException invalidOp)
+            {
+                Console.WriteLine("Erro operação inválida");
+                Console.WriteLine($"Pedido inválido. ID: {id}");
+                Console.WriteLine(invalidOp.Message);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
         }
 
         return orderResponse.Content;
@@ -118,18 +148,20 @@ public class IntegracaoTray
 
         var pedido = new DadosPedido
         {
-            idPedido = JsonExtensions.RequireUInt64(order, "id"), //order.GetProperty("id").GetUInt64(),
+            idPedido = ulong.Parse(JsonExtensions.RequireString(order, "id")), //order.GetProperty("id").GetUInt64(),
             status = JsonExtensions.RequireString(order, "status"), //order.GetProperty("status").GetString(),
             dtInc = DateTime.Now,
             dtAlt = DateTime.Now,
             totalPedido = JsonExtensions.RequireString(order, "total"), //order.GetProperty("total").GetString(),
-            idClienteEcommerce = JsonExtensions.RequireUInt64(order, "customer_id"), //order.GetProperty("customer_id").GetUInt64(),
+            idClienteEcommerce = ulong.Parse(JsonExtensions.RequireString(order, "customer_id")), //order.GetProperty("customer_id").GetUInt64(),
             modoEntregaDescricao = "entrega",//JsonExtensions.RequireModoEntrega(dadosEntrega_lines) == "3" ? "entrega" : "retirar-loja", 
             modoEntregaId = "3",//JsonExtensions.RequireModoEntrega(dadosEntrega_lines), 
             dadosEntrega = GetDadosEntrega(order),
             dadosCliente = GetDadosCliente(order),
             produtos = GetDadosProduto(order)
         };
+
+        await _acessoTpa.CadastrarPedido(pedido);        
     }
 
     private DadosEntrega GetDadosEntrega(JsonElement order)
@@ -153,7 +185,7 @@ public class IntegracaoTray
     {
         var dadosEntrega = order.GetProperty("Customer");
         var enderecos = dadosEntrega.GetProperty("CustomerAddresses");
-        var enderecoCliente = enderecos[0];
+        var enderecoCliente = enderecos[0].GetProperty("CustomerAddress");
         return new DadosCliente
         {
             nomeCliente = JsonExtensions.RequireString(dadosEntrega, "name"),
@@ -192,5 +224,25 @@ public class IntegracaoTray
         }
 
         return listaProdutos;
+    }
+
+    private void AtualizarStatusProntoEnvio(string orderId)
+    {
+        var request = new RestClient($"{api_address}/orders/{orderId}?access_token={access_token}");
+        var requestParameters = new RestRequest()
+            .AddParameter("[\"Order\"][\"status_id\"]", "1")
+            .AddParameter("[\"Order\"][\"taxes\"]", "0.01")
+            .AddParameter("[\"Order\"][\"shipment\"]", "Sedex")
+            .AddParameter("[\"Order\"][\"shipment_value\"]", "5.58")
+            .AddParameter("[\"Order\"][\"discount\"]", "0.01")
+            .AddParameter("[\"Order\"][\"sending_code\"]", "123456")
+            .AddParameter("[\"Order\"][\"sending_date\"]", "2015-04-20")
+            .AddParameter("[\"Order\"][\"store_note\"]", "Pedido em 1 vez de R$ 51,85 através do Boleto.")
+            .AddParameter("[\"Order\"][\"customer_note\"]", "11")
+            .AddParameter("[\"Order\"][\"partner_id\"]", "2");
+
+        var orderResponse = request.Put(requestParameters);
+
+        Console.WriteLine(orderResponse);
     }
 }
