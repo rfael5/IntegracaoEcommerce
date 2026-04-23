@@ -7,8 +7,8 @@ public class IntegracaoTray
         private readonly string consumer_key = "a75943d6601451a79a1d80b8b6eb3ccd32fcf9d3e7fa2c39ad32010180e9a0ac";
         private readonly string consumer_secret = "5706705aba4d2cf32d6024adf9878926799f6ad4e777d5ebc5eafb41850db83a";
         private readonly string code = "7690ae9e20502a84af649f187a54a8203daa140aab2491eda027a79f3d8504b9";
-        private string access_token = "APP_ID-8289-STORE_ID-1471881-8b4ac12f5ecbf2e5b3b07c702f1fdb37109c01ac9763635f1f82a59ed843f0bd";
-        private string refresh_token = "d33dc23527b0a6224640aedeebbe74e0c289392fac5c6290651c3e02c21a76df";
+        private string access_token = "APP_ID-8289-STORE_ID-1471881-c43f8508735754df1a05560139a043927af87c4be4b72cf3e641ee409a23df76";
+        private string refresh_token = "5f2863ef1c0e8fc9948e3286f52ad48bc6a196c96ed6925f05e56c968359a2bc";
 
         public readonly AcessoTPA _acessoTpa;
 
@@ -86,17 +86,16 @@ public class IntegracaoTray
                 Console.WriteLine(completeOrder);
                 Console.WriteLine("###############");
                 await CriarPedido(completeOrder);
-                //AtualizarStatusProntoEnvio(id);
-                try
-                {
-                    await AtualizarStatusProntoEnvio(id);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Pedido {id} salvo no ERP, mas falhou ao atualizar no Wordpress.");
-                    Console.WriteLine(ex);
-                    throw;
-                }
+                // try
+                // {
+                //     await AtualizarStatusProntoEnvio(id);
+                // }
+                // catch (Exception ex)
+                // {
+                //     Console.WriteLine($"Pedido {id} salvo no ERP, mas falhou ao atualizar no Wordpress.");
+                //     Console.WriteLine(ex);
+                //     throw;
+                // }
             }
             catch(InvalidOperationException invalidOp)
             {
@@ -162,7 +161,9 @@ public class IntegracaoTray
             produtos = GetDadosProduto(order)
         };
 
-        await _acessoTpa.CadastrarPedido(pedido);        
+        Console.WriteLine(JsonSerializer.Serialize(pedido));
+
+        //await _acessoTpa.CadastrarPedido(pedido);        
     }
 
     private DadosEntrega GetDadosEntrega(JsonElement order)
@@ -233,7 +234,7 @@ public class IntegracaoTray
         {
             var request = new RestClient($"{api_address}/orders/{orderId}?access_token={access_token}");
             var requestParameters = new RestRequest()
-                .AddParameter("Order[status_id]", "353");
+                .AddParameter("Order[status_id]", "1");
 
             var orderResponse = request.Put(requestParameters);
 
