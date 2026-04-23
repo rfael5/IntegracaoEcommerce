@@ -13,25 +13,25 @@ public class EcommerceController : ControllerBase
     }
 
     [EnableCors("All")]
-    [HttpGet("auth")]
-    public async Task<IActionResult> GetTokens()
-    {
-        var content = await _integracao.Authorize();
-        return Ok(new {message = content});
-    }
+    // [HttpGet("auth")]
+    // public async Task<IActionResult> GetTokens()
+    // {
+    //     var content = await _integracao.Authorize();
+    //     return Ok(new {message = content});
+    // }
 
-    [HttpGet("refresh")]
-    public async Task<IActionResult> RefreshToken()
-    {
-        var content = await _integracao.Refresh();
-        return Ok(content);
-    }
+    // [HttpGet("refresh")]
+    // public async Task<IActionResult> RefreshToken()
+    // {
+    //     var content = await _integracao.Refresh();
+    //     return Ok(content);
+    // }
 
     [HttpGet("orders")]
     public async Task<IActionResult> GetOrders()
     {
-        var orders = await _integracao.GetOrders();
-        return Ok(orders);
+        await _integracao.GetOrders();
+        return Ok(new {message = "ok"});
     }
 
     [HttpGet("complete-order")]

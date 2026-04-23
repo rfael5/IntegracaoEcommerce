@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using DotNetEnv;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,8 +20,11 @@ builder.Services.AddCors(options =>
         });
 });
 
-builder.Services.AddScoped<AcessoEcommerce>();
+builder.Services.AddSingleton<EcommerceAuthService>();
 builder.Services.AddScoped<IntegracaoTray>();
+builder.Services.AddHostedService<BackgroundScopeConsumer>();
+
+builder.Services.AddScoped<AcessoEcommerce>();
 builder.Services.AddScoped<AcessoTPA>();
 builder.Services.AddScoped<UsuariosTPA>();
 builder.Services.AddScoped<CadastroPedido>();
@@ -50,3 +55,4 @@ app.UseForwardedHeaders();
 app.UseRouting();
 app.UseCors("All");
 app.Run();
+

@@ -3,81 +3,82 @@ using RestSharp;
 
 public class IntegracaoTray
 {
-        private readonly string api_address = "https://celiasouttomayor.commercesuite.com.br/web_api";
-        private readonly string consumer_key = "a75943d6601451a79a1d80b8b6eb3ccd32fcf9d3e7fa2c39ad32010180e9a0ac";
-        private readonly string consumer_secret = "5706705aba4d2cf32d6024adf9878926799f6ad4e777d5ebc5eafb41850db83a";
-        private readonly string code = "7690ae9e20502a84af649f187a54a8203daa140aab2491eda027a79f3d8504b9";
-        private string access_token = "APP_ID-8289-STORE_ID-1471881-c43f8508735754df1a05560139a043927af87c4be4b72cf3e641ee409a23df76";
-        private string refresh_token = "5f2863ef1c0e8fc9948e3286f52ad48bc6a196c96ed6925f05e56c968359a2bc";
+        //private readonly string api_address = "https://celiasouttomayor.commercesuite.com.br/web_api";
+        //private readonly string consumer_key = "a75943d6601451a79a1d80b8b6eb3ccd32fcf9d3e7fa2c39ad32010180e9a0ac";
+        //private readonly string consumer_secret = "5706705aba4d2cf32d6024adf9878926799f6ad4e777d5ebc5eafb41850db83a";
+        //private readonly string code = "7690ae9e20502a84af649f187a54a8203daa140aab2491eda027a79f3d8504b9";
+        //private string access_token = "APP_ID-8289-STORE_ID-1471881-d03cce2240f50d520af69603bd6c74c52c2ad489c3e70011e95a3ab572632bda";
+        //private string refresh_token = "e10d9d0faff0651eb4883dbfb41f8a81f37516f24c8715b88f7c2a41c43387dd";
 
         public readonly AcessoTPA _acessoTpa;
+        public EcommerceAuthService _authService;
 
-        public IntegracaoTray(AcessoTPA acessoTpa)
+        public IntegracaoTray(AcessoTPA acessoTpa, EcommerceAuthService authService)
         {
             _acessoTpa = acessoTpa;
+            _authService = authService;
         }
 
-        public async Task<string?> Authorize()
-        {
-        var client = new RestClient($"{api_address}/auth");
-        var request = new RestRequest()
-            .AddParameter("consumer_key", consumer_key)
-            .AddParameter("consumer_secret", consumer_secret)
-            .AddParameter("code", code);
-        try
-        {
-            var response = client.Post(request);
-            Console.WriteLine(response.Content);
-            using var doc = JsonDocument.Parse(response.Content);
-            var content = doc.RootElement;
-            access_token = JsonExtensions.RequireString(content, "access_token");
-            refresh_token = JsonExtensions.RequireString(content, "refresh_token");
+    //     public async Task<string?> Authorize()
+    //     {
+    //     var client = new RestClient($"{api_address}/auth");
+    //     var request = new RestRequest()
+    //         .AddParameter("consumer_key", consumer_key)
+    //         .AddParameter("consumer_secret", consumer_secret)
+    //         .AddParameter("code", code);
+    //     try
+    //     {
+    //         var response = client.Post(request);
+    //         Console.WriteLine(response.Content);
+    //         using var doc = JsonDocument.Parse(response.Content);
+    //         var content = doc.RootElement;
+    //         access_token = JsonExtensions.RequireString(content, "access_token");
+    //         refresh_token = JsonExtensions.RequireString(content, "refresh_token");
 
-            return response.Content;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
-            throw;
-        }
-    }
+    //         return response.Content;
+    //     }
+    //     catch (Exception e)
+    //     {
+    //         Console.WriteLine(e);
+    //         throw;
+    //     }
+    // }
 
-    public async Task<AuthResponse> Refresh()
+    // public async Task<AuthResponse> Refresh()
+    // {
+    //     try
+    //     {
+    //         var refresh = new RestClient($"{api_address}/auth");
+    //         var request = new RestRequest()
+    //             .AddParameter("refresh_token", refresh_token);
+
+    //         var response = refresh.Get(request);
+
+    //         var refreshResponse = JsonSerializer.Deserialize<AuthResponse>(response.Content);
+    //         access_token = refreshResponse.access_token;
+    //         refresh_token = refreshResponse.refresh_token;
+
+    //         return refreshResponse;
+    //     }
+    //     catch (Exception e)
+    //     {
+    //         Console.WriteLine(e.Message);
+    //         throw;
+    //     }
+    // }
+
+    public async Task RequestOrders()
     {
-        try
-        {
-            var refresh = new RestClient($"{api_address}/auth");
-            var request = new RestRequest()
-                .AddParameter("refresh_token", refresh_token);
-
-            var response = refresh.Get(request);
-
-            var refreshResponse = JsonSerializer.Deserialize<AuthResponse>(response.Content);
-            access_token = refreshResponse.access_token;
-            refresh_token = refreshResponse.refresh_token;
-
-            return refreshResponse;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.Message);
-            throw;
-        }
-    }
-
-    public async Task<string> GetOrders()
-    {
-        var request = new RestClient($"{api_address}/orders?status=PRODUCAO");
+        var request = new RestClient($"{_authService.api_address}/orders?status=PRODUCAO");
         var orderRequests = new RestRequest()
-            .AddParameter("access_token", access_token);
+            .AddParameter("access_token", _authService.access_token);
         var orderResponse = request.Get(orderRequests);
 
         using var doc = JsonDocument.Parse(orderResponse.Content);
         var ordersDoc = doc.RootElement;
         var orders = ordersDoc.GetProperty("Orders");
-        //Console.WriteLine(ordersList);
 
-        foreach(var teste in orders.EnumerateArray())
+        foreach (var teste in orders.EnumerateArray())
         {
             var id = teste.GetProperty("Order").GetProperty("id").GetString();
             try
@@ -86,37 +87,52 @@ public class IntegracaoTray
                 Console.WriteLine(completeOrder);
                 Console.WriteLine("###############");
                 await CriarPedido(completeOrder);
-                // try
-                // {
-                //     await AtualizarStatusProntoEnvio(id);
-                // }
-                // catch (Exception ex)
-                // {
-                //     Console.WriteLine($"Pedido {id} salvo no ERP, mas falhou ao atualizar no Wordpress.");
-                //     Console.WriteLine(ex);
-                //     throw;
-                // }
             }
-            catch(InvalidOperationException invalidOp)
+            catch (InvalidOperationException invalidOp)
             {
                 Console.WriteLine("Erro operação inválida");
                 Console.WriteLine($"Pedido inválido. ID: {id}");
                 Console.WriteLine(invalidOp.Message);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex);
             }
         }
+    }
 
-        return orderResponse.Content;
+    public async Task GetOrders()
+    {
+        while(true)
+        {
+            if(_authService.access_token == null)
+            {
+                await _authService.Authorize();
+                await RequestOrders();
+            }
+            else if(DateTime.Now >= _authService.date_expiration_access_token)
+            {
+
+                await _authService.Refresh();
+                await RequestOrders();
+            }
+            else
+            {
+                Console.WriteLine("##########################");
+                Console.WriteLine(_authService.access_token);
+                Console.WriteLine("##########################");
+                await RequestOrders();
+            }
+
+            await Task.Delay(20000);
+        }
     }
 
     public async Task<string> GetCompleteOrder(int orderId)
     {
-        var order = new RestClient($"{api_address}/orders/{orderId}/complete");
+        var order = new RestClient($"{_authService.api_address}/orders/{orderId}/complete");
         var orderRequests = new RestRequest()
-            .AddParameter("access_token", access_token);
+            .AddParameter("access_token", _authService.access_token);
         var orderResponse = order.Get(orderRequests);
 
         return orderResponse.Content;
@@ -124,18 +140,18 @@ public class IntegracaoTray
 
     public async Task<string> GetProducts()
     {
-        var products = new RestClient($"{api_address}/products");
+        var products = new RestClient($"{_authService.api_address}/products");
         var productsRequest = new RestRequest()
-            .AddParameter("access_token", access_token);
+            .AddParameter("access_token", _authService.access_token);
         var productsResponse = products.Get(productsRequest);
         return productsResponse.Content;
     }
 
     public async Task<string> GetCustomers()
     {
-        var customers = new RestClient($"{api_address}/customers");
+        var customers = new RestClient($"{_authService.api_address}/customers");
         var customersRequest = new RestRequest()
-            .AddParameter("access_token", access_token);
+            .AddParameter("access_token", _authService.access_token);
         var customersResponse = customers.Get(customersRequest);
         return customersResponse.Content;
     }
@@ -232,7 +248,7 @@ public class IntegracaoTray
     {
         try
         {
-            var request = new RestClient($"{api_address}/orders/{orderId}?access_token={access_token}");
+            var request = new RestClient($"{_authService.api_address}/orders/{orderId}?access_token={_authService.access_token}");
             var requestParameters = new RestRequest()
                 .AddParameter("Order[status_id]", "1");
 
