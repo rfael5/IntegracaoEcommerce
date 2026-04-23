@@ -23,6 +23,7 @@ builder.Services.AddScoped<AcessoTPA>();
 builder.Services.AddScoped<UsuariosTPA>();
 builder.Services.AddScoped<CadastroPedido>();
 builder.Services.AddScoped<ProdutosTPA>();
+builder.Services.AddScoped<ServicosTPA>();
 builder.Services.AddScoped<Ajustes>();
 builder.Services.AddScoped<GeracaoContrato>();
 builder.Services.AddControllers();
