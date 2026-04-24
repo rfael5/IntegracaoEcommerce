@@ -5,9 +5,9 @@ using RestSharp;
 public class EcommerceAuthService 
 {
     public readonly string api_address = "https://celiasouttomayor.commercesuite.com.br/web_api";
-    private readonly string consumer_key = "a75943d6601451a79a1d80b8b6eb3ccd32fcf9d3e7fa2c39ad32010180e9a0ac";
-    private readonly string consumer_secret = "5706705aba4d2cf32d6024adf9878926799f6ad4e777d5ebc5eafb41850db83a";
-    private readonly string storeCode = "7690ae9e20502a84af649f187a54a8203daa140aab2491eda027a79f3d8504b9";
+    private readonly string consumer_key = Environment.GetEnvironmentVariable("ECOMMERCE_KEY");
+    private readonly string consumer_secret = Environment.GetEnvironmentVariable("ECOMMERCE_SECRET");
+    private readonly string storeCode = Environment.GetEnvironmentVariable("STORE_CODE");
 
     public int code;
     public string message;

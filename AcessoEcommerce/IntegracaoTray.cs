@@ -3,13 +3,6 @@ using RestSharp;
 
 public class IntegracaoTray
 {
-        //private readonly string api_address = "https://celiasouttomayor.commercesuite.com.br/web_api";
-        //private readonly string consumer_key = "a75943d6601451a79a1d80b8b6eb3ccd32fcf9d3e7fa2c39ad32010180e9a0ac";
-        //private readonly string consumer_secret = "5706705aba4d2cf32d6024adf9878926799f6ad4e777d5ebc5eafb41850db83a";
-        //private readonly string code = "7690ae9e20502a84af649f187a54a8203daa140aab2491eda027a79f3d8504b9";
-        //private string access_token = "APP_ID-8289-STORE_ID-1471881-d03cce2240f50d520af69603bd6c74c52c2ad489c3e70011e95a3ab572632bda";
-        //private string refresh_token = "e10d9d0faff0651eb4883dbfb41f8a81f37516f24c8715b88f7c2a41c43387dd";
-
         public readonly AcessoTPA _acessoTpa;
         public EcommerceAuthService _authService;
 
