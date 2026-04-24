@@ -80,6 +80,15 @@ public class IntegracaoTray
                 Console.WriteLine(completeOrder);
                 Console.WriteLine("###############");
                 await CriarPedido(completeOrder);
+                try
+                {
+                    await AtualizarStatusProntoEnvio(id);
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine($"Pedido {id} salvo no ERP, mas falhou ao atualizar no Wordpress.");
+                    Console.WriteLine(e);
+                }
             }
             catch (InvalidOperationException invalidOp)
             {
@@ -117,7 +126,7 @@ public class IntegracaoTray
                 await RequestOrders();
             }
 
-            await Task.Delay(20000);
+            await Task.Delay(60000);
         }
     }
 
@@ -172,7 +181,7 @@ public class IntegracaoTray
 
         Console.WriteLine(JsonSerializer.Serialize(pedido));
 
-        //await _acessoTpa.CadastrarPedido(pedido);        
+       await _acessoTpa.CadastrarPedido(pedido);        
     }
 
     private DadosEntrega GetDadosEntrega(JsonElement order)
