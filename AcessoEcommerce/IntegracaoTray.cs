@@ -60,6 +60,16 @@ public class IntegracaoTray
     //     }
     // }
 
+    public async Task<string> GetCarrinho()
+    {
+        var session_id = "5jk0cug07u8r87jed98pcgf9rr";
+        var request = new RestClient($"{_authService.api_address}/carts/{session_id}/complete");
+        var cartRequest = new RestRequest()
+            .AddParameter("access_token", _authService.access_token);
+        var response = request.Get(cartRequest);
+        return response.Content;
+    }
+
     public async Task RequestOrders()
     {
         var request = new RestClient($"{_authService.api_address}/orders?status=PRODUCAO");
@@ -275,5 +285,10 @@ public class IntegracaoTray
             Console.WriteLine(e);
             throw;
         }
+    }
+
+    public async Task TesteFrontEcommerce()
+    {
+        Console.WriteLine("Comunicação ecommerce");
     }
 }

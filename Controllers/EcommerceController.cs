@@ -12,6 +12,13 @@ public class EcommerceController : ControllerBase
         _integracao = integracao;
     }
 
+    [HttpGet("teste-ecommerce")]
+    public async Task<IActionResult> TesteFrontEcommerce()
+    {
+        await _integracao.TesteFrontEcommerce();
+        return Ok(new {message = "ok"});
+    }
+
     [EnableCors("All")]
     // [HttpGet("auth")]
     // public async Task<IActionResult> GetTokens()
@@ -27,6 +34,13 @@ public class EcommerceController : ControllerBase
     //     return Ok(content);
     // }
 
+    [HttpGet("carrinho")]
+    public async Task<IActionResult> GetCarrinho()
+    {
+        var res = await _integracao.GetCarrinho();
+        return Ok(res);
+    }
+
     [HttpGet("orders")]
     public async Task<IActionResult> GetOrders()
     {
@@ -37,7 +51,7 @@ public class EcommerceController : ControllerBase
     [HttpGet("complete-order")]
     public async Task<IActionResult> GetCompleteOrder()
     {
-        var order = await _integracao.GetCompleteOrder(7);
+        var order = await _integracao.GetCompleteOrder(3);
         return Ok(order);
     }
 
