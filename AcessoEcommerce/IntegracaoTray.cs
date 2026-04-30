@@ -3,14 +3,14 @@ using RestSharp;
 
 public class IntegracaoTray
 {
-        public readonly AcessoTPA _acessoTpa;
-        public EcommerceAuthService _authService;
+    public readonly AcessoTPA _acessoTpa;
+    public EcommerceAuthService _authService;
 
-        public IntegracaoTray(AcessoTPA acessoTpa, EcommerceAuthService authService)
-        {
-            _acessoTpa = acessoTpa;
-            _authService = authService;
-        }
+    public IntegracaoTray(AcessoTPA acessoTpa, EcommerceAuthService authService)
+    {
+        _acessoTpa = acessoTpa;
+        _authService = authService;
+    }
 
     //     public async Task<string?> Authorize()
     //     {
@@ -62,8 +62,18 @@ public class IntegracaoTray
 
     public async Task<string> GetCarrinho()
     {
-        var session_id = "5jk0cug07u8r87jed98pcgf9rr";
+        //mgbphccu72k56v9jmvrph8am6q
+        var session_id = "uvopc6o74u9g6ukaegfone3ni7";
         var request = new RestClient($"{_authService.api_address}/carts/{session_id}/complete");
+        var cartRequest = new RestRequest()
+            .AddParameter("access_token", _authService.access_token);
+        var response = request.Get(cartRequest);
+        return response.Content;
+    }
+
+    public async Task<string> TodosCarrinhos()
+    {
+        var request = new RestClient($"{_authService.api_address}/carts");
         var cartRequest = new RestRequest()
             .AddParameter("access_token", _authService.access_token);
         var response = request.Get(cartRequest);

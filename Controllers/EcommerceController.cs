@@ -41,6 +41,13 @@ public class EcommerceController : ControllerBase
         return Ok(res);
     }
 
+    [HttpGet("todos-carrinhos")]
+    public async Task<IActionResult> GetTodosCarrinho()
+    {
+        var res = await _integracao.TodosCarrinhos();
+        return Ok(res);
+    }
+    
     [HttpGet("orders")]
     public async Task<IActionResult> GetOrders()
     {
@@ -51,7 +58,7 @@ public class EcommerceController : ControllerBase
     [HttpGet("complete-order")]
     public async Task<IActionResult> GetCompleteOrder()
     {
-        var order = await _integracao.GetCompleteOrder(3);
+        var order = await _integracao.GetCompleteOrder(11);
         return Ok(order);
     }
 
