@@ -424,20 +424,36 @@ public class Ajustes
             new SqlParameter("pkDoctoped", pkDoctoped));
     }
 
+    public async Task AdicionarCancelamentoHistorico(int pkDoctoped, int operador, string nomeAdendo)
+    {
+        var doctopedHistorico = new TpaDoctopedHistoricoDTO
+        {
+            rdxDoctoped = pkDoctoped,
+            etapa = "T",
+            parcial = "N",
+            situacao = "C",
+            texto = $"ADENDO;{nomeAdendo}",
+            dtInc = BrazilTime.Now(),
+            opInc = operador
+        };
+
+        _context.DoctopedHistorico.Add(doctopedHistorico);
+    }
+
     public async Task CancelarAjuste(int pkAjustePed, int operador, int pkDoctoped)
     {
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
-            var pkContratoAdendo = await _context.ContratosAdendos
-                .Where(adendo => Convert.ToInt32(adendo.idxTabela) == pkAjustePed)
-                .Select(adendo => adendo.pkContratoAdendo)
+            var dadosAdendo = await _context.ContratosAdendos
+                .Where(adendo => adendo.idxTabela == pkAjustePed.ToString())
+                .Select(adendo => new {adendo.pkContratoAdendo, adendo.descricao})
                 .SingleAsync();            
             
-            await CancelarAdendoContrato(pkContratoAdendo, operador);
+            await CancelarAdendoContrato(dadosAdendo.pkContratoAdendo, operador);
             await SetarStatusCanceladoAjustePed(pkAjustePed, operador);
             await AtualizarTotalAjustes(pkAjustePed, pkDoctoped); 
-
+            await AdicionarCancelamentoHistorico(pkDoctoped, operador, dadosAdendo.descricao);
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
         }
