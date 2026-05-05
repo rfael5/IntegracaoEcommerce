@@ -13,6 +13,13 @@ public class AjustesController:ControllerBase
         _ajustesService = ajustesService;
     }
 
+    public record RequestCancelamento
+    {
+        public int pkAjustePed { get; init; }
+        public int operador { get; init; }
+        public int pkDoctoped { get; init; }
+    }
+
  
 
     [EnableCors("All")]
@@ -61,6 +68,41 @@ public class AjustesController:ControllerBase
                 status = 200,
                 message = "OK",
                 data = result
+            });
+        }
+        catch(HttpRequestException e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(
+                (int?)e.StatusCode ?? 500,
+                new ResponseData
+                {
+                    status = (int?)e.StatusCode ?? 500,
+                    message = e.Message
+                });
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(500, new ResponseData
+            {
+                status = 500,
+                message = e.InnerException?.Message ?? e.Message
+            });
+        }
+    }
+
+    [HttpPost("cancelar-ajuste")]
+    public async Task<IActionResult> CancelarAjuste([FromBody] RequestCancelamento requestCancelamento)
+    {
+         try
+        {
+            //var result = await _ajustesService.AutorizarAjuste(requestAdendo);
+            await _ajustesService.CancelarAjuste(requestCancelamento.pkAjustePed, requestCancelamento.operador, requestCancelamento.pkDoctoped);
+            return Ok(new ResponseData {
+                status = 200,
+                message = "OK",
+                data = requestCancelamento.pkAjustePed
             });
         }
         catch(HttpRequestException e)

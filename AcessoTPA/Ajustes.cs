@@ -356,4 +356,98 @@ public class Ajustes
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    /// CANCELAMENTO AJUSTES
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    private async Task CancelarAdendoContrato(int pkContratoAdendo, int operador)
+    {
+        var dataAtual = BrazilTime.Now();
+        const string _query = $@"
+            UPDATE TPACONTRATOADENDO
+                SET SITUACAO = 'C',
+                DTALT = @dataAtual,
+                OPALT = @operador
+            WHERE PK_CONTRATOADENDO = @pkContratoAdendo
+        ";
+
+        await _context.Database.ExecuteSqlRawAsync(
+            _query,
+            new SqlParameter("dataAtual", dataAtual),
+            new SqlParameter("operador", operador),
+            new SqlParameter("pkContratoAdendo", pkContratoAdendo));
+    }
+
+    private async Task SetarStatusCanceladoAjustePed(int pkAjustePed, int operador)
+    {
+        var dataAtual = BrazilTime.Now();
+        const string _query = @$"
+            UPDATE TPAAJUSTEPED
+                SET SITUACAO = 'C',
+                TIPOAJUSTE = 'C',
+                DTALT = @dataAtual,
+                OPALT = @operador
+            WHERE PK_AJUSTEPED = @pkAjustePed
+        ";
+
+        await _context.Database.ExecuteSqlRawAsync(
+            _query,
+            new SqlParameter("dataAtual", dataAtual),
+            new SqlParameter("operador", operador),
+            new SqlParameter("pkAjustePed", pkAjustePed));
+    }
+
+    private async Task AtualizarTotalAjustes(int pkAjustePed, int pkDoctoped)
+    {
+        var valorAjuste = await _context.AjustePed
+            .Where(ajuste => ajuste.pkAjustePed == pkAjustePed)
+            .Select(ajuste => ajuste.totalValor)
+            .SingleAsync();
+
+        var totalAjusteDoctoped = await _context.Doctoped
+            .Where(evento => evento.pkDoctoped == pkDoctoped)
+            .Select(doctoped => doctoped.totalAjuste)
+            .SingleAsync();
+        
+        var novoValorAjuste = totalAjusteDoctoped - valorAjuste;
+
+        const string _query = @$"
+            UPDATE TPADOCTOPED
+                SET TOTALAJUSTE = @novoValorAjuste
+            WHERE PK_DOCTOPED = @pkDoctoped
+        ";
+
+        await _context.Database.ExecuteSqlRawAsync(
+            _query,
+            new SqlParameter("novoValorAjuste", novoValorAjuste),
+            new SqlParameter("pkDoctoped", pkDoctoped));
+    }
+
+    public async Task CancelarAjuste(int pkAjustePed, int operador, int pkDoctoped)
+    {
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            var pkContratoAdendo = await _context.ContratosAdendos
+                .Where(adendo => Convert.ToInt32(adendo.idxTabela) == pkAjustePed)
+                .Select(adendo => adendo.pkContratoAdendo)
+                .SingleAsync();            
+            
+            await CancelarAdendoContrato(pkContratoAdendo, operador);
+            await SetarStatusCanceladoAjustePed(pkAjustePed, operador);
+            await AtualizarTotalAjustes(pkAjustePed, pkDoctoped); 
+
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch(Exception ex)
+        {
+            await transaction.RollbackAsync();
+            Console.WriteLine(ex);
+            throw;
+        }
+    }
+
+
 }
