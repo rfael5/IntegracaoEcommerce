@@ -6,10 +6,24 @@ using Microsoft.AspNetCore.Cors;
 public class EcommerceController : ControllerBase
 {
     private readonly IntegracaoTray _integracao;
+    private readonly EcommerceAuthService _auth;
 
-    public EcommerceController(IntegracaoTray integracao)
+    public EcommerceController(IntegracaoTray integracao, EcommerceAuthService auth)
     {
         _integracao = integracao;
+        _auth = auth;
+    }
+
+    public record Teste
+    {
+        public string value { get; set; }
+    }
+
+    [HttpPost("teste-envio")]
+    public async Task<IActionResult> TesteEnvio([FromBody] Teste teste)
+    {
+        Console.WriteLine(teste.value);
+        return Ok(new {message = "ok"});
     }
 
     [HttpGet("teste-ecommerce")]
@@ -20,19 +34,19 @@ public class EcommerceController : ControllerBase
     }
 
     [EnableCors("All")]
-    // [HttpGet("auth")]
-    // public async Task<IActionResult> GetTokens()
-    // {
-    //     var content = await _integracao.Authorize();
-    //     return Ok(new {message = content});
-    // }
+    [HttpGet("auth")]
+    public async Task<IActionResult> GetTokens()
+    {
+        var content = await _auth.Authorize();
+        return Ok(new {message = content});
+    }
 
-    // [HttpGet("refresh")]
-    // public async Task<IActionResult> RefreshToken()
-    // {
-    //     var content = await _integracao.Refresh();
-    //     return Ok(content);
-    // }
+    [HttpGet("refresh")]
+    public async Task<IActionResult> RefreshToken()
+    {
+        var content = await _auth.Refresh();
+        return Ok(content);
+    }
 
     [HttpGet("carrinho")]
     public async Task<IActionResult> GetCarrinho()
@@ -58,7 +72,7 @@ public class EcommerceController : ControllerBase
     [HttpGet("complete-order")]
     public async Task<IActionResult> GetCompleteOrder()
     {
-        var order = await _integracao.GetCompleteOrder(11);
+        var order = await _integracao.GetCompleteOrder(21);
         return Ok(order);
     }
 
