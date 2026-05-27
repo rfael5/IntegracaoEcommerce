@@ -143,7 +143,7 @@ public class CadastroPedido
             freteValor = doctoped.freteValor,
             servValor = doctoped.servValor,
             servTotal = doctoped.servTotal,
-            situacao = "N",
+            situacao = doctoped.situacao,
             temProduto = doctoped.temProduto,
             temServico = doctoped.temServico,
             temLocacao = doctoped.temLocacao,
