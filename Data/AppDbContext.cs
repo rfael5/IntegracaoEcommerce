@@ -28,11 +28,11 @@ public class AppDbContext : DbContext
         //                      $"Database={Environment.GetEnvironmentVariable("DB_NAME")};" +
         //                      "TrustServerCertificate=True;";
 
-        var connectionString=$"Server=192.168.1.45;" +
+        var connectionString=$"Server=192.168.1.55;" +
                               $"User Id='Sa';" +
-                              $"Password='bcsm@122#';" +  
+                              $"Password='P@ssw0rd2023';" +  
                               $"Database='SOUTTOMAYOR';" +
-                              "Encrypt=False;";
+                              "TrustServerCertificate=True;";
 
         optionsBuilder.UseSqlServer(connectionString);  
     }
