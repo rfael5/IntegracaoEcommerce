@@ -14,15 +14,16 @@ public class EcommerceController : ControllerBase
         _auth = auth;
     }
 
-    public record Teste
+    public record DadosAgendamento
     {
-        public string value { get; set; }
+        public string session_id { get; init; }
+        public string data_entrega { get; init; }
     }
 
-    [HttpPost("teste-envio")]
-    public async Task<IActionResult> TesteEnvio([FromBody] Teste teste)
+    [HttpPost("agendar-entrega")]
+    public async Task<IActionResult> AgendarEntrega([FromBody] DadosAgendamento dadosAgendamento)
     {
-        Console.WriteLine(teste.value);
+        Console.WriteLine(dadosAgendamento);
         return Ok(new {message = "ok"});
     }
 
