@@ -36,7 +36,7 @@ public class AppDbContext : DbContext
 
         var connectionString=$"Server=192.168.1.45;" +
                               $"User Id='Sa';" +
-                              $"Password='bcsm@122#';" +  
+                              $"Password='bcsm@122#';" + 
                               $"Database='SOUTTOMAYOR';" +
                               "TrustServerCertificate=True;";
 
