@@ -1,4 +1,5 @@
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+RUN sed -i 's/SECLEVEL=2/SECLEVEL=1/g' /etc/ssl/openssl.cnf
 WORKDIR /app
 EXPOSE 5227
 ENV ASPNETCORE_URLS=http://+:5227
