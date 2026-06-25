@@ -22,7 +22,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddSingleton<EcommerceAuthService>();
 builder.Services.AddScoped<IntegracaoTray>();
-builder.Services.AddHostedService<BackgroundScopeConsumer>();
+//builder.Services.AddHostedService<BackgroundScopeConsumer>();
 
 builder.Services.AddScoped<AcessoEcommerce>();
 builder.Services.AddScoped<AcessoTPA>();
