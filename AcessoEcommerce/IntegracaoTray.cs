@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using RestSharp;
 
@@ -10,6 +11,12 @@ public class IntegracaoTray
     {
         _acessoTpa = acessoTpa;
         _authService = authService;
+    }
+
+    public record InfoDataEntrega
+    {
+        public DateTime dataEntrega { get; init; }
+        public string horaEntrega { get; init; }        
     }
 
     //     public async Task<string?> Authorize()
@@ -85,59 +92,67 @@ public class IntegracaoTray
 
     public async Task RequestOrders()
     {
-        var request = new RestClient($"{_authService.api_address}/orders?status=PRODUCAO");
-        var orderRequests = new RestRequest()
-            .AddParameter("access_token", _authService.access_token);
-        var orderResponse = request.Get(orderRequests);
-
-        using var doc = JsonDocument.Parse(orderResponse.Content);
-        var ordersDoc = doc.RootElement;
-        var orders = ordersDoc.GetProperty("Orders");
-
-        foreach (var teste in orders.EnumerateArray())
+        Console.WriteLine("orders");
+        try
         {
-            var id = teste.GetProperty("Order").GetProperty("id").GetString();
-            try
+            var request = new RestClient($"{_authService.api_address}/orders?status=Producao");
+            var orderRequests = new RestRequest()
+                .AddParameter("access_token", _authService.access_token);
+            var orderResponse = request.Get(orderRequests);
+
+            using var doc = JsonDocument.Parse(orderResponse.Content);
+            var ordersDoc = doc.RootElement;
+            var orders = ordersDoc.GetProperty("Orders");
+            Console.WriteLine(orders);
+
+            foreach (var teste in orders.EnumerateArray())
             {
-                var completeOrder = await GetCompleteOrder(Convert.ToInt32(id));
-                Console.WriteLine(completeOrder);
-                Console.WriteLine("###############");
-                await CriarPedido(completeOrder);
+                var id = teste.GetProperty("Order").GetProperty("id").GetString();
                 try
                 {
-                    await AtualizarStatusProntoEnvio(id);
+                    var completeOrder = await GetCompleteOrder(Convert.ToInt32(id));
+                    await CriarPedido(completeOrder);
+                    try
+                    {
+                        await AtualizarStatusProntoEnvio(id);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine($"Pedido {id} salvo no ERP, mas falhou ao atualizar no Wordpress.");
+                        Console.WriteLine(e);
+                    }
                 }
-                catch(Exception e)
+                catch (InvalidOperationException invalidOp)
                 {
-                    Console.WriteLine($"Pedido {id} salvo no ERP, mas falhou ao atualizar no Wordpress.");
-                    Console.WriteLine(e);
+                    Console.WriteLine("Erro operação inválida");
+                    Console.WriteLine($"Pedido inválido. ID: {id}");
+                    Console.WriteLine(invalidOp.Message);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
                 }
             }
-            catch (InvalidOperationException invalidOp)
-            {
-                Console.WriteLine("Erro operação inválida");
-                Console.WriteLine($"Pedido inválido. ID: {id}");
-                Console.WriteLine(invalidOp.Message);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine(ex);
         }
     }
 
     public async Task GetOrders()
     {
-        while(true)
+        while (true)
         {
-            if(_authService.access_token == null)
+            if (_authService.access_token == null)
             {
+                Console.WriteLine("null");
                 await _authService.Authorize();
                 await RequestOrders();
             }
-            else if(DateTime.Now >= _authService.date_expiration_access_token)
+            else if (DateTime.Now >= _authService.date_expiration_access_token)
             {
-
+                Console.WriteLine("old");
                 await _authService.Refresh();
                 await RequestOrders();
             }
@@ -149,7 +164,7 @@ public class IntegracaoTray
                 await RequestOrders();
             }
 
-            await Task.Delay(60000);
+            await Task.Delay(600000);
         }
     }
 
@@ -181,11 +196,43 @@ public class IntegracaoTray
         return customersResponse.Content;
     }
 
+    private InfoDataEntrega GetDataEntrega(JsonElement extensions, ulong numeroPedido)
+    {
+        var additionalInfo = extensions.GetProperty("AdditionalProductInfo")[0];
+        var dataInformation = JsonExtensions.RequireString(additionalInfo , "information");
+        var splitted = dataInformation.Split(" ");
+        var horaString = splitted[2][..5];
+        var horaFormatada = $"{horaString[0..2]}{horaString[3..5]}";
+        //DateTime dataFormatada;
+
+        if(DateTime.TryParseExact(splitted[1], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dataFormatada))
+        {
+            Console.WriteLine($"Data formatada com sucesso: {dataFormatada}");
+        }
+        else
+        {
+            throw new Exception($"Erro ao tentar formatar data. Pedido: {numeroPedido}");
+        }
+
+        return new InfoDataEntrega()
+        {
+            dataEntrega = dataFormatada,
+            horaEntrega = horaFormatada
+        };
+
+    }
+
     private async Task CriarPedido(string orderContent)
     {
         using var doc = JsonDocument.Parse(orderContent);
         var root = doc.RootElement;
         var order = root.GetProperty("Order");
+        var extensions = root.GetProperty("Extensions");
+        var _idPedido = ulong.Parse(JsonExtensions.RequireString(order, "id"));
+        var infoDataEntrega = GetDataEntrega(extensions, _idPedido);
+        Console.WriteLine("?????????????");
+        Console.WriteLine(JsonSerializer.Serialize(infoDataEntrega));
+        Console.WriteLine("?????????????");
 
         var pedido = new DadosPedido
         {
@@ -193,6 +240,9 @@ public class IntegracaoTray
             status = JsonExtensions.RequireString(order, "status"), //order.GetProperty("status").GetString(),
             dtInc = DateTime.Now,
             dtAlt = DateTime.Now,
+            dataEntrega = infoDataEntrega.dataEntrega,
+            horaEntrega = infoDataEntrega.horaEntrega,
+            frete = decimal.Parse(JsonExtensions.RequireString(order, "shipment_value")),
             totalPedido = JsonExtensions.RequireString(order, "total"), //order.GetProperty("total").GetString(),
             idClienteEcommerce = ulong.Parse(JsonExtensions.RequireString(order, "customer_id")), //order.GetProperty("customer_id").GetUInt64(),
             modoEntregaDescricao = "entrega",//JsonExtensions.RequireModoEntrega(dadosEntrega_lines) == "3" ? "entrega" : "retirar-loja", 
@@ -202,7 +252,7 @@ public class IntegracaoTray
             produtos = GetDadosProduto(order)
         };
 
-        Console.WriteLine(JsonSerializer.Serialize(pedido));
+        //Console.WriteLine(JsonSerializer.Serialize(pedido));
 
        await _acessoTpa.CadastrarPedido(pedido);        
     }

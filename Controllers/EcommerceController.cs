@@ -73,7 +73,7 @@ public class EcommerceController : ControllerBase
     [HttpGet("complete-order")]
     public async Task<IActionResult> GetCompleteOrder()
     {
-        var order = await _integracao.GetCompleteOrder(21);
+        var order = await _integracao.GetCompleteOrder(31);
         return Ok(order);
     }
 

@@ -4,7 +4,10 @@ public record DadosPedido
     public required string status { get; init; }
     public DateTime dtInc { get; init; }
     public DateTime dtAlt { get; init; }
+    public DateTime dataEntrega { get; init; }
+    public string horaEntrega { get; init; }
     public required string totalPedido { get; init; }
+    public decimal frete { get; set; }
     public ulong idClienteEcommerce { get; init; }
     public required string modoEntregaDescricao { get; init; }
     public required string modoEntregaId { get; init; }
