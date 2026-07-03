@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Cors;
+using RestSharp;
+using System.Text.Json;
 
 [ApiController]
 [Route("ecommerce")]
@@ -70,10 +72,34 @@ public class EcommerceController : ControllerBase
         return Ok(new {message = "ok"});
     }
 
+    [HttpGet("get-all-orders")]
+    public async Task<IActionResult> GetAllOrders()
+    {
+        var request = new RestClient($"{_auth.api_address}/orders?status=A enviar Vindi,A enviar");
+        var orderRequests = new RestRequest()
+            .AddParameter("access_token", _auth.access_token);
+        
+        var orderResponse = request.Get(orderRequests);
+        
+        return Ok(orderResponse.Content);
+    }
+
+    [HttpGet("get-statuses")]
+    public async Task<IActionResult> GetStatuses()
+    {
+        var request = new RestClient($"{_auth.api_address}/orders/statuses");
+        var orderRequests = new RestRequest()
+            .AddParameter("access_token", _auth.access_token);
+        
+        var orderResponse = request.Get(orderRequests);
+        
+        return Ok(orderResponse.Content);
+    }
+
     [HttpGet("complete-order")]
     public async Task<IActionResult> GetCompleteOrder()
     {
-        var order = await _integracao.GetCompleteOrder(31);
+        var order = await _integracao.GetCompleteOrder(41);
         return Ok(order);
     }
 

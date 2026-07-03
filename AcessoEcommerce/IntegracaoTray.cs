@@ -95,7 +95,8 @@ public class IntegracaoTray
         Console.WriteLine("orders");
         try
         {
-            var request = new RestClient($"{_authService.api_address}/orders?status=Producao");
+            //var request = new RestClient($"{_authService.api_address}/orders?status=Producao");
+            var request = new RestClient($"{_authService.api_address}/orders?status=A enviar Vindi,A enviar");
             var orderRequests = new RestRequest()
                 .AddParameter("access_token", _authService.access_token);
             var orderResponse = request.Get(orderRequests);
@@ -118,7 +119,7 @@ public class IntegracaoTray
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine($"Pedido {id} salvo no ERP, mas falhou ao atualizar no Wordpress.");
+                        Console.WriteLine($"Pedido {id} salvo no ERP, mas falhou ao atualizar na Tray.");
                         Console.WriteLine(e);
                     }
                 }
@@ -201,11 +202,18 @@ public class IntegracaoTray
         var additionalInfo = extensions.GetProperty("AdditionalProductInfo")[0];
         var dataInformation = JsonExtensions.RequireString(additionalInfo , "information");
         var splitted = dataInformation.Split(" ");
-        var horaString = splitted[2][..5];
+        Console.WriteLine("??????????????????????????????");
+        foreach(var teste in splitted)
+        {
+            Console.WriteLine(teste);
+        }
+        var horaString = splitted[7][..5];
+        Console.WriteLine(horaString);
+        Console.WriteLine("??????????????????????????????");
         var horaFormatada = $"{horaString[0..2]}{horaString[3..5]}";
         //DateTime dataFormatada;
 
-        if(DateTime.TryParseExact(splitted[1], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dataFormatada))
+        if(DateTime.TryParseExact(splitted[6], "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dataFormatada))
         {
             Console.WriteLine($"Data formatada com sucesso: {dataFormatada}");
         }
@@ -245,8 +253,8 @@ public class IntegracaoTray
             frete = decimal.Parse(JsonExtensions.RequireString(order, "shipment_value")),
             totalPedido = JsonExtensions.RequireString(order, "total"), //order.GetProperty("total").GetString(),
             idClienteEcommerce = ulong.Parse(JsonExtensions.RequireString(order, "customer_id")), //order.GetProperty("customer_id").GetUInt64(),
-            modoEntregaDescricao = "entrega",//JsonExtensions.RequireModoEntrega(dadosEntrega_lines) == "3" ? "entrega" : "retirar-loja", 
-            modoEntregaId = "3",//JsonExtensions.RequireModoEntrega(dadosEntrega_lines), 
+            modoEntregaDescricao = JsonExtensions.RequireString(order, "shipment") == "Retirar no local" ? "retirar-loja" : "entrega", //JsonExtensions.RequireModoEntrega(dadosEntrega_lines) == "3" ? "entrega" : "retirar-loja", //entrega
+            modoEntregaId = JsonExtensions.RequireString(order, "shipment") == "Retirar no local" ? "1" : "3",//JsonExtensions.RequireModoEntrega(dadosEntrega_lines), 
             dadosEntrega = GetDadosEntrega(order),
             dadosCliente = GetDadosCliente(order),
             produtos = GetDadosProduto(order)
@@ -254,7 +262,7 @@ public class IntegracaoTray
 
         //Console.WriteLine(JsonSerializer.Serialize(pedido));
 
-       await _acessoTpa.CadastrarPedido(pedido);        
+       await _acessoTpa.CadastrarPedidoTray(pedido);        
     }
 
     private DadosEntrega GetDadosEntrega(JsonElement order)
@@ -306,7 +314,7 @@ public class IntegracaoTray
             {
                 idProdutoEcommerce = ulong.Parse(JsonExtensions.RequireString(prod, "product_id")),
                 nomeProduto = JsonExtensions.RequireString(prod, "name"),
-                idProdutoTPA = ulong.Parse(JsonExtensions.RequireString(prod, "reference")),
+                idProdutoTPA = ulong.Parse(JsonExtensions.RequireString(prod, "product_id")),
                 quantidade = decimal.Parse(JsonExtensions.RequireString(prod, "quantity")),
                 preco = decimal.Parse(JsonExtensions.RequireString(prod, "price")),
                 subtotal = decimal.Parse(JsonExtensions.RequireString(prod, "price")),
@@ -325,7 +333,8 @@ public class IntegracaoTray
         {
             var request = new RestClient($"{_authService.api_address}/orders/{orderId}?access_token={_authService.access_token}");
             var requestParameters = new RestRequest()
-                .AddParameter("Order[status_id]", "1");
+                //.AddParameter("Order[status_id]", "1");
+                .AddParameter("Order[status_id]", "353");
 
             var orderResponse = request.Put(requestParameters);
 

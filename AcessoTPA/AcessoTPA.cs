@@ -34,7 +34,7 @@ public class AcessoTPA
     public async Task<InformacoesProdutoTPA> GetDadosProduto(ulong _pkProduto)
     {
         var pk = _pkProduto.ToString();
-        var result = await _context.Produto.Where(produto => produto.pkProduto.Trim() == pk).SingleOrDefaultAsync();
+        var result = await _dbPrincipal.Produto.Where(produto => produto.pkProduto.Trim() == pk).SingleOrDefaultAsync();
         if(result == null)
         {
             throw new InvalidOperationException("Produto não encontrado no banco de dados");
@@ -260,6 +260,8 @@ public class AcessoTPA
             }
     }
 
+
+
     public async Task CancelarDocumento(int pkDoctoped, int operador)
     {
         var now = BrazilTime.Now();
@@ -276,5 +278,115 @@ public class AcessoTPA
             new SqlParameter("operador", operador),
             new SqlParameter("now", now),
             new SqlParameter("pkDoctoped", pkDoctoped));
+    }
+
+
+
+
+/// ///////////////////////////////////////////////////
+///////////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////
+/// ///////////////////////////////////////////////////
+/// 
+/// 
+    public async Task<int?> CriarNumeroDocumentoECTray()
+    { 
+        var maxDocumento = await _dbPrincipal.Doctoped.Where(doc => doc.tpDocto == "EC").MaxAsync(op => (int?)op.documento) ?? 0;
+        Console.WriteLine(maxDocumento);
+        Console.WriteLine(maxDocumento + 1);
+        return maxDocumento + 1;
+    }
+
+    public async Task<TpaDoctopedDTO> CadastrarEventoDoctopedTray(DadosPedido dadosPedido, string _idxEntidade, string _idxEnderecoObra)
+    {
+        var numeroDocumento = await CriarNumeroDocumentoECTray();
+        var totalPedido = decimal.Parse(dadosPedido.totalPedido, CultureInfo.InvariantCulture);
+        Console.WriteLine(numeroDocumento);
+        var novoDoctoped = new TpaDoctopedDTO()
+        {
+            documento = numeroDocumento,
+            idxEntidade = _idxEntidade,
+            nome = dadosPedido.dadosCliente.nomeCliente,
+            cnpjCpf = dadosPedido.dadosCliente.cpf_cnpj,
+            idxVendedor1 = "         899",
+            totalDocto = totalPedido,
+            prodValor = totalPedido,
+            prodTotal = totalPedido,
+            freteValor = 100,
+            despDivValor = 0,
+            dtSaida = dadosPedido.dataEntrega,
+            dtEvento = dadosPedido.dataEntrega,
+            totalItensProd = dadosPedido.produtos.Count,
+            totalQtProd = dadosPedido.produtos.Count,
+            opInc = 436,
+            opAlt = 436,
+            idxEnderecoObra = _idxEnderecoObra,
+            entregar = dadosPedido.modoEntregaId,
+            nfDtEmissao = null,
+            nfDtSaida = null,
+            nfHoraSaida = "",
+            idxDoctoEvento = dadosPedido.idPedido.ToString(),
+            idxDeptoEnt = "",
+            dtPrevisao = dadosPedido.dataEntrega,
+            horaPrevisao = dadosPedido.horaEntrega,
+            dtPrevisaoIni = null,
+            totalFinanceiro = totalPedido
+        };
+        Console.WriteLine(JsonSerializer.Serialize(novoDoctoped));
+        
+        return novoDoctoped;
+    }
+
+    public async Task CadastrarDoctopedFPTray(int _rdxDoctoped, decimal _valor)
+    {
+        var novoFP = new TpaDoctoPedFpDTO
+        {
+            rdxDoctoPed = _rdxDoctoped,
+            valor = _valor,
+            opInc = 436,
+            opAlt = 436
+        };        
+        _dbPrincipal.DoctopedFp.Add(novoFP);
+    }
+
+    public async Task CadastrarPedidoTray(DadosPedido dadosPedido)
+    {
+        using var transaction = await _dbPrincipal.Database.BeginTransactionAsync();
+        try
+        {
+            var idPedidoString = dadosPedido.idPedido.ToString();
+            var exists = await _dbPrincipal.Doctoped.AnyAsync(d => d.idxDoctoEvento.Trim() == idPedidoString && d.tpDocto == "EC");
+            if(exists)
+            {
+                Console.WriteLine(idPedidoString);
+                Console.WriteLine(JsonSerializer.Serialize(exists));
+                return;
+            }
+            // var idxEntidade = await _usuariosService.CadastrarUsuario(dadosPedido.dadosCliente); 
+            // var idxEndereco = await _usuariosService.CadastrarEnderecoUsuario(idxEntidade, dadosPedido.dadosEntrega);
+           var userKeys = await _usuariosService.BuscarUsuarioTray(dadosPedido.dadosCliente, dadosPedido.dadosEntrega);
+           var doctoped = await CadastrarEventoDoctopedTray(dadosPedido, userKeys.pkCadastro, userKeys.pkEndereco);
+           _dbPrincipal.Doctoped.Add(doctoped);
+           await _dbPrincipal.SaveChangesAsync();
+
+           int item = 1;
+          
+            foreach(var produto in dadosPedido.produtos)
+            { 
+                var movtoped = await CadastrarProdutosEventoMovtoped(produto, doctoped.pkDoctoped, item++ );
+                _dbPrincipal.Movtoped.Add(movtoped);
+            }
+            await CadastrarDoctopedFPTray(doctoped.pkDoctoped, doctoped.totalDocto);
+            await _dbPrincipal.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            }
+            catch(Exception e)
+            {
+                await transaction.RollbackAsync();
+                Console.WriteLine(e);
+                Console.WriteLine(JsonSerializer.Serialize(dadosPedido));
+                throw;
+            }
     }
 }

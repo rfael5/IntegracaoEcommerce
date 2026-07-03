@@ -25,10 +25,21 @@ public class PrincipalDbContext : DbContext
     public DbSet<CategoriaEvento> CategoriasEvento { get; set; }
     public DbSet<EventoTp> EventoTps { get; set; }
     public DbSet<EventoTpSv> EventoTpSv { get; set; }
-
+    public DbSet<TpaDoctopedDTO> Doctoped { get; set; }
+    public DbSet<TpaMovtopedDTO> Movtoped { get; set; }
+    public DbSet<TpaDoctoPedFpDTO> DoctopedFp { get; set; }
+    public DbSet<TpaCadastroDTO> CadastroUsuarioTPA { get; set; }
+    public DbSet<TpaEnderecoDTO> Enderecos { get; set; }
+    public DbSet<TpaContatoDTO> Contatos { get; set; }
+    public DbSet<InformacoesProdutoTPA> Produto { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ProdutoServico>().HasNoKey();
+        modelBuilder.Entity<TpaCadastroDTO>().ToTable(tb => tb.UseSqlOutputClause(false));
+        modelBuilder.Entity<TpaEnderecoDTO>().ToTable(tb => tb.UseSqlOutputClause(false));
+        modelBuilder.Entity<TpaContatoDTO>().ToTable(tb => tb.UseSqlOutputClause(false));
+        modelBuilder.Entity<TpaEventoOrcDTO>().ToTable(tb => tb.UseSqlOutputClause(false));
+        modelBuilder.Entity<TpaEventoOrcPedDTO>().ToTable(tb => tb.UseSqlOutputClause(false));
 
         base.OnModelCreating(modelBuilder);
     }
