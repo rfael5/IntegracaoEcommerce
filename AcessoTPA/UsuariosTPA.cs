@@ -213,10 +213,10 @@ public class UsuariosTPA
     }
    public async Task<TpaCadastroDTO> CadastrarUsuarioTray(DadosCliente dadosCliente)
     {
-        var novoCodigo = await CriarCodigoCliente();
+        var novoCodigo = await CriarCodigoClienteTray();
         var novoUsuario = new TpaCadastroDTO()
         {
-            pkCadastro = await CriarPkCadastro(),
+            pkCadastro = await CriarPkCadastroTray(),
             codCadastro = novoCodigo,
             nome = dadosCliente.nomeCliente,
             fantasia = dadosCliente.nomeCliente,
@@ -239,9 +239,17 @@ public class UsuariosTPA
         return novoUsuario;
     }
 
+    public async Task<string> CriarPkEnderecoTray()
+    {
+        var ultimoId = await _dbPrincipal.Enderecos.MaxAsync(endereco=> endereco.id);
+        var ultimoIdMaisUm = ultimoId + 1;
+        var novoPkEndereco = $"       {ultimoIdMaisUm}";
+        return novoPkEndereco;
+    }
+
     public async Task<string> CadastrarEnderecoUsuarioTray(string idUsuario, DadosEntrega dadosEntrega)
     {
-        var idEndereco = await CriarPkEndereco();
+        var idEndereco = await CriarPkEnderecoTray();
         var enderecoUsuario = new TpaEnderecoDTO()
         {
             pkEndereco = idEndereco,
@@ -261,9 +269,18 @@ public class UsuariosTPA
         return enderecoUsuario.pkEndereco;
     }
 
+    public async Task<string> CriarPkContatoTray()
+    {
+        var ultimoId = await _dbPrincipal.Contatos.MaxAsync(contato => contato.id);
+        var ultimoIdMaisUm = ultimoId + 1;
+        var novoPkContato = $"       {ultimoIdMaisUm}";
+        return novoPkContato;
+        
+    }
+
     public async Task CadastrarContatoTray(TpaCadastroDTO cadastro)
     {
-        var idContato = await CriarPkContato();
+        var idContato = await CriarPkContatoTray();
         var contatoUsuario = new TpaContatoDTO()
         {
             pkContato = idContato,
@@ -286,9 +303,9 @@ public class UsuariosTPA
        var userKeys = await ClienteCadastradoTray(dadosCliente.cpf_cnpj);
        if(userKeys.pkCadastro == null)
         {
-            var novoUsuario = await CadastrarUsuario(dadosCliente);
-            var _pkEndereco = await CadastrarEnderecoUsuario(novoUsuario.pkCadastro, dadosEntrega);
-            await CadastrarContato(novoUsuario);
+            var novoUsuario = await CadastrarUsuarioTray(dadosCliente);
+            var _pkEndereco = await CadastrarEnderecoUsuarioTray(novoUsuario.pkCadastro, dadosEntrega);
+            await CadastrarContatoTray(novoUsuario);
             return new UserKeys(){pkCadastro = novoUsuario.pkCadastro, pkEndereco = _pkEndereco};
         }
         else
