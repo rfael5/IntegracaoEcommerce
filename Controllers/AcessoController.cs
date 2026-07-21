@@ -48,6 +48,48 @@ public class UserController:ControllerBase
         return Ok(new { message = "ok" });
     }
 
+    [HttpGet("get-casas-evento")]
+    public async Task<IActionResult> GetCasasEvento([FromQuery] QueryFilter filter, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var result = await _acessoTpa.GetCasaEvento(filter, cancellationToken);
+            return Ok(new PagedResponseData
+            {
+                status = 200,
+                message = "OK",
+                data = result.Data,
+                pageNumber = result.PageNumber,
+                pageSize = result.PageSize,
+                totalPages = result.TotalPages,
+                totalRecords = result.TotalRecords,
+                hasNextPage = result.HasNextPage,
+                hasPreviousPage = result.HasPreviousPage
+            });
+        }
+        catch (HttpRequestException e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(
+                (int?)e.StatusCode ?? 500,
+                new ResponseData
+                {
+                    status = (int?)e.StatusCode ?? 500,
+                    message = e.Message
+                });
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(500, new ResponseData
+            {
+                status = 500,
+                message = e.InnerException?.Message ?? e.Message
+            });
+        }
+
+    }
+
     [HttpGet("get-vendedores")]
     public async Task<IActionResult> GetVendedores([FromQuery] QueryFilter filter, CancellationToken cancellationToken)
     {

@@ -69,7 +69,7 @@ public class AcessoTPA
         return response;
     }
 
-     public async Task<List<ServicoMateriais>> GetMateriais(QueryFilter filter, CancellationToken cancellationToken = default)
+    public async Task<List<ServicoMateriais>> GetMateriais(QueryFilter filter, CancellationToken cancellationToken = default)
     {
         var pageNumber = Math.Max(1, filter.PageNumber);
         var pageSize = Math.Clamp(filter.PageSize, 1, 100);
@@ -93,6 +93,47 @@ public class AcessoTPA
                 new SqlParameter("@offset", offset), 
                 new SqlParameter("@pageSize", pageSize)).AsNoTracking().ToListAsync(cancellationToken);
         return Materiais;
+    }
+
+    public async Task<PagedResponse<CasaEvento>> GetCasaEvento(QueryFilter filter, CancellationToken cancellationToken = default)
+    {
+        var pageNumber = Math.Max(1, filter.PageNumber);
+        var pageSize = Math.Clamp(filter.PageSize, 1, 100);
+        var offset = (pageNumber - 1) * pageSize;
+
+        const string _query = @$"
+            SELECT CADASTRO.PK_CADASTRO AS pkCadastro, CADASTRO.NOME AS nome, ENDERECO.ENDTP as endTp, 
+            ENDERECO.ENDERECO AS rua, ENDERECO.ENDNUM AS numero, ENDERECO.BAIRRO AS bairro, 
+            ENDERECO.CIDADE AS cidade, ENDERECO.UF AS uf, ENDERECO.CEP AS cep
+                FROM TPACADASTRO AS CADASTRO
+            INNER JOIN TPAENDERECO AS ENDERECO ON CADASTRO.PK_CADASTRO = ENDERECO.IDX_TABELA
+            WHERE CADASTRO.CASAEVENTO = 'S'
+            ORDER BY CADASTRO.NOME
+            OFFSET @offset ROWS
+            FETCH NEXT @pageSize ROWS ONLY
+        "; 
+
+         const string count = @"
+            SELECT COUNT(*) AS Value FROM TPACADASTRO AS CADASTRO
+                INNER JOIN TPAENDERECO AS ENDERECO ON CADASTRO.PK_CADASTRO = ENDERECO.IDX_TABELA
+            WHERE CADASTRO.CASAEVENTO = 'S'
+        ";
+
+        var totalRecords = await _dbPrincipal.Database.SqlQueryRaw<int>(count).SingleAsync(cancellationToken);
+
+        var casasEvento = await _context.CasasEvento.FromSqlRaw(
+            _query,
+            new SqlParameter("@offset", offset),
+            new SqlParameter("@pageSize", pageSize)).AsNoTracking().ToListAsync(cancellationToken);
+        
+        return new PagedResponse<CasaEvento>
+        {
+            Data = casasEvento,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalRecords = totalRecords,
+            TotalPages = (int)Math.Ceiling(totalRecords / (double)pageSize)
+        };
     }
 
     public async Task<PagedResponse<VendedoresDTO>> GetVendedores(QueryFilter filter, CancellationToken cancellationToken = default)
