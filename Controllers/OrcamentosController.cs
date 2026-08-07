@@ -54,7 +54,8 @@ public class OrcamentosController:ControllerBase
         return true;
     }
 
-    [HttpPost("autorizar-or")]
+    //CRIA E GERA CONTRATO
+    [HttpPost("criar-or")]
     public async Task<IActionResult> AutorizarOr([FromBody] InformacoesOR informacoesOr)
     {
         try
@@ -93,49 +94,50 @@ public class OrcamentosController:ControllerBase
     }
     
 
-     [HttpPost("criar-or")]
-    public async Task<IActionResult> CriarOr([FromBody] InformacoesOR informacoesOr)
-    {
-        try
-        {
-            var ip = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
-            if (string.IsNullOrEmpty(ip))
-            {
-                ip = HttpContext.Connection.RemoteIpAddress?.ToString();
-            }
+    //SOMENTE CRIA OR
+    //  [HttpPost("criar-or")]
+    // public async Task<IActionResult> CriarOr([FromBody] InformacoesOR informacoesOr)
+    // {
+    //     try
+    //     {
+    //         var ip = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+    //         if (string.IsNullOrEmpty(ip))
+    //         {
+    //             ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+    //         }
 
-            var result = await _cadastroPedido.CadastrarNovaOr(informacoesOr);
+    //         var result = await _cadastroPedido.CadastrarNovaOr(informacoesOr);
 
-            return Ok(new ResponseData
-            {
-                status = 200,
-                message = "OK",
-                data = result
-            });
-        }
-        catch (HttpRequestException e)
-        {
-            Console.WriteLine(e);
+    //         return Ok(new ResponseData
+    //         {
+    //             status = 200,
+    //             message = "OK",
+    //             data = result
+    //         });
+    //     }
+    //     catch (HttpRequestException e)
+    //     {
+    //         Console.WriteLine(e);
 
-            return StatusCode(
-                (int?)e.StatusCode ?? 500,
-                new ResponseData
-                {
-                    status = (int?)e.StatusCode ?? 500,
-                    message = e.Message
-                });
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e);
+    //         return StatusCode(
+    //             (int?)e.StatusCode ?? 500,
+    //             new ResponseData
+    //             {
+    //                 status = (int?)e.StatusCode ?? 500,
+    //                 message = e.Message
+    //             });
+    //     }
+    //     catch (Exception e)
+    //     {
+    //         Console.WriteLine(e);
 
-            return StatusCode(500, new ResponseData
-            {
-                status = 500,
-                message = e.InnerException?.Message ?? e.Message
-            });
-        }
-    }
+    //         return StatusCode(500, new ResponseData
+    //         {
+    //             status = 500,
+    //             message = e.InnerException?.Message ?? e.Message
+    //         });
+    //     }
+    // }
 
     [HttpPost("criar-ec")]
     public async Task<IActionResult> CriarEc([FromBody] InformacoesEC informacoesEc)

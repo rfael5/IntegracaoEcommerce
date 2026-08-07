@@ -226,7 +226,7 @@ public class AcessoTPA
             codProduto = dadosProdutoTpa.codProduto,
             descricao = dadosProdutoTpa.descricao,
             idxProduto = dadosProdutoTpa.pkProduto, 
-            unidade = dadosProdutoTpa.unidade,
+            unidade = dadosProdutoTpa.un_ecommerce,
             cst = dadosProdutoTpa.csti,
             l_quantidade = produto.quantidade,
             l_precouni = produto.preco,
@@ -291,14 +291,14 @@ public class AcessoTPA
             await _context.SaveChangesAsync();
             await transaction.CommitAsync();
 
-            }
-            catch(Exception e)
-            {
-                await transaction.RollbackAsync();
-                Console.WriteLine(e);
-                Console.WriteLine(JsonSerializer.Serialize(dadosPedido));
-                throw;
-            }
+        }
+        catch(Exception e)
+        {
+            await transaction.RollbackAsync();
+            Console.WriteLine(e);
+            Console.WriteLine(JsonSerializer.Serialize(dadosPedido));
+            throw;
+        }
     }
 
 

@@ -13,6 +13,8 @@ public class InformacoesProdutoTPA
     public string descricao { get; init; }
     [Column("CODPRODUTO")]
     public string codProduto { get; init; }
+    [Column("UN")]
+    public string un_ecommerce { get; init; }
     [Column("UN1")]
     public string unidade { get; init; }
     [Column("CSTI")]
