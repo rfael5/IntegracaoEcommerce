@@ -26,6 +26,7 @@ public class ProdutosTPA
                 FROM TPAPRODEVENTOSV as PRODSV
             INNER JOIN TPAEVENTOSV AS TPSV ON PRODSV.RDX_EVENTOSV = TPSV.PK_EVENTOSV
             INNER JOIN TPAPRODUTO AS PRODUTO ON PRODSV.IDX_PRODUTO = PRODUTO.PK_PRODUTO
+                AND PRODUTO.IDX_NEGOCIO NOT IN ('Desativados')
                 AND PRODUTO.STATUS = 'A'
                 AND PRODUTO.VENDA = 'S'
             ORDER BY PRODSV.PK_PRODEVENTOSV 
@@ -38,6 +39,7 @@ public class ProdutosTPA
                 FROM TPAPRODEVENTOSV as PRODSV
             INNER JOIN TPAEVENTOSV AS TPSV ON PRODSV.RDX_EVENTOSV = TPSV.PK_EVENTOSV
             INNER JOIN TPAPRODUTO AS PRODUTO ON PRODSV.IDX_PRODUTO = PRODUTO.PK_PRODUTO 
+                AND PRODUTO.IDX_NEGOCIO NOT IN ('Desativados')
                 AND PRODUTO.STATUS = 'A'
                 AND PRODUTO.VENDA = 'S'
         ";
@@ -77,7 +79,8 @@ public class ProdutosTPA
                 FROM TPAPRODUTO AS PRODUTO
             INNER JOIN TPATABELAPROD AS TABELAPRECOS ON PRODUTO.PK_PRODUTO = TABELAPRECOS.IDX_PRODUTO
             INNER JOIN TPATABELA AS TABELA ON TABELAPRECOS.RDX_TABELA = TABELA.PK_TABELA
-                WHERE PRODUTO.STATUS = 'A' 
+                WHERE PRODUTO.IDX_NEGOCIO NOT IN ('Desativados') 
+            AND PRODUTO.STATUS = 'A' 
             AND PRODUTO.VENDA = 'S'
             ORDER BY PRODUTO.ID
             OFFSET @offset ROWS 
@@ -89,7 +92,8 @@ public class ProdutosTPA
                 FROM TPAPRODUTO AS PRODUTO
             INNER JOIN TPATABELAPROD AS TABELAPRECOS ON PRODUTO.PK_PRODUTO = TABELAPRECOS.IDX_PRODUTO
             INNER JOIN TPATABELA AS TABELA ON TABELAPRECOS.RDX_TABELA = TABELA.PK_TABELA
-                WHERE PRODUTO.STATUS = 'A' 
+                WHERE PRODUTO.IDX_NEGOCIO NOT IN ('Desativados') 
+            AND PRODUTO.STATUS = 'A' 
             AND PRODUTO.VENDA = 'S'
         ";
 
@@ -128,7 +132,8 @@ public class ProdutosTPA
             PRODUTO.IDX_NEGOCIO, PRODUTO.IDX_CLASSIFICACAO, PRODUTO.CSTI, PRODUTO.PCCUSTO, PRODUTO.LOCACAO, PRODUTO.NCM,
             PRODUTO.ENCOMENDA
                 FROM TPAPRODUTO AS PRODUTO
-            WHERE PRODUTO.STATUS = 'A' 
+            WHERE PRODUTO.IDX_NEGOCIO NOT IN ('Desativados')
+            AND PRODUTO.STATUS = 'A' 
             AND PRODUTO.VENDA = 'S'
                 ORDER BY PRODUTO.ID
             OFFSET @offset ROWS 
@@ -138,7 +143,8 @@ public class ProdutosTPA
         const string count = @"
             SELECT COUNT(*) as Value
                 FROM TPAPRODUTO AS PRODUTO
-            WHERE PRODUTO.STATUS = 'A' 
+            WHERE PRODUTO.IDX_NEGOCIO NOT IN ('Desativados') 
+            AND PRODUTO.STATUS = 'A' 
             AND PRODUTO.VENDA = 'S'
         ";
 
