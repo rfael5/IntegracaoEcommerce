@@ -34,4 +34,6 @@ public record ProdutoPreco
     public string nomeTabela { get; init; }
     [Column("PRECO1U1")]
     public decimal preco { get; init; }
+    [Column("ENCOMENDA")]
+    public string permiteEncomenda { get; init; }
 }

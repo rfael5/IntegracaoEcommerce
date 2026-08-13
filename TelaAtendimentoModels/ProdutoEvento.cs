@@ -28,4 +28,6 @@ public record ProdutoEvento
     public string locacao { get; init; }
     [Column("NCM")]
     public string ncm { get; init; }
+    [Column("ENCOMENDA")]
+    public string permiteEncomenda { get; init; }
 }

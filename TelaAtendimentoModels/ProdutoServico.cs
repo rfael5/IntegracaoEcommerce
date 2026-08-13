@@ -17,4 +17,5 @@ public class ProdutoServico
     public decimal pcCusto { get; init; }
     public string locacao { get; init; }
     public string ncm { get; init; }
+    public string permiteEncomenda { get; init; }
 }
