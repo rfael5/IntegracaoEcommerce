@@ -51,7 +51,19 @@ public class ProdutosTPA
             new SqlParameter("@pageSize", pageSize))
             .AsNoTracking()
             .ToListAsync(cancellationToken);
-        //return produtos;
+
+        foreach (var produto in produtos)
+        {
+            produto.itemServico = produto.itemServico?.Replace("\0", "");
+            produto.codProduto = produto.codProduto?.Replace("\0", "");
+            produto.nomeProduto = produto.nomeProduto?.Replace("\0", "");
+            produto.referencia = produto.referencia?.Replace("\0", "");
+            produto.un = produto.un?.Replace("\0", "");
+            produto.idxNegocio = produto.idxNegocio?.Replace("\0", "");
+            produto.idxClassificacao = produto.idxClassificacao?.Replace("\0", "");
+            produto.locacao = produto.locacao?.Replace("\0", "");
+            produto.ncm = produto.ncm?.Replace("\0", "");
+        }
 
         return new PagedResponse<ProdutoServico>
         {
@@ -107,6 +119,17 @@ public class ProdutosTPA
             .ToListAsync(cancellationToken);
 
         //return produtos;
+        foreach (var produto in produtos)
+        {
+            produto.codProduto = produto.codProduto?.Replace("\0", "");
+            produto.descricao= produto.descricao?.Replace("\0", "");
+            produto.referencia = produto.referencia?.Replace("\0", "");
+            produto.un = produto.un?.Replace("\0", "");
+            produto.idxNegocio = produto.idxNegocio?.Replace("\0", "");
+            produto.idxClassificacao = produto.idxClassificacao?.Replace("\0", "");
+            produto.locacao = produto.locacao?.Replace("\0", "");
+            produto.ncm = produto.ncm?.Replace("\0", "");
+        }
 
         return new PagedResponse<ProdutoPreco>
         {
@@ -157,7 +180,18 @@ public class ProdutosTPA
             .AsNoTracking()
             .ToListAsync(cancellationToken);
         
-        //return produtos
+        foreach (var produto in produtos)
+        {
+            produto.codProduto = produto.codProduto?.Replace("\0", "");
+            produto.descricao= produto.descricao?.Replace("\0", "");
+            produto.referencia = produto.referencia?.Replace("\0", "");
+            produto.un = produto.un?.Replace("\0", "");
+            produto.idxNegocio = produto.idxNegocio?.Replace("\0", "");
+            produto.idxClassificacao = produto.idxClassificacao?.Replace("\0", "");
+            produto.locacao = produto.locacao?.Replace("\0", "");
+            produto.ncm = produto.ncm?.Replace("\0", "");
+        }
+
         return new PagedResponse<ProdutoEvento>
         {
             Data = produtos,
@@ -207,6 +241,18 @@ public class ProdutosTPA
             .AsNoTracking()
             .ToListAsync(cancellationToken);
 
+        foreach (var produto in materiais)
+        {
+            produto.codProduto = produto.codProduto?.Replace("\0", "");
+            produto.descricao= produto.descricao?.Replace("\0", "");
+            produto.referencia = produto.referencia?.Replace("\0", "");
+            produto.un = produto.un?.Replace("\0", "");
+            produto.idxNegocio = produto.idxNegocio?.Replace("\0", "");
+            produto.idxClassificacao = produto.idxClassificacao?.Replace("\0", "");
+            produto.locacao = produto.locacao?.Replace("\0", "");
+            produto.ncm = produto.ncm?.Replace("\0", "");
+        }
+
         return new PagedResponse<ProdutoEvento>
         {
             Data = materiais,
@@ -241,6 +287,14 @@ public class ProdutosTPA
         var totalRecords = await _dbPrincipal.Database.SqlQueryRaw<int>(count).SingleAsync();
 
         var tiposServico = await _dbPrincipal.ItensServico.FromSqlRaw(_query).ToListAsync();
+
+        foreach (var servico in tiposServico)
+        {
+            servico.descricao= servico.descricao?.Replace("\0", "");
+            servico.totalizador = servico.totalizador?.Replace("\0", "");
+            servico.classes = servico.classes?.Replace("\0", "");
+        }
+
         return new PagedResponse<ItemServico>
         {
             Data = tiposServico,
