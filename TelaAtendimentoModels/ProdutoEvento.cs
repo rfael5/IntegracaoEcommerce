@@ -14,7 +14,7 @@ public record ProdutoEvento
     public string descricao { get; init; }
     [Column("REFERENCIA")]
     public string referencia { get; init; }
-    [Column("UN")]
+    [Column("UN1")]
     public string un { get; init; }
     [Column("CSTI")]
     public string csti { get; init; }
