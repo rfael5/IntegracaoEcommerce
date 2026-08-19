@@ -8,11 +8,17 @@ public class PrincipalDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-         var connectionString=$"Server={Environment.GetEnvironmentVariable("DB_HOST_SERVER")};" +
-                             $"User Id={Environment.GetEnvironmentVariable("DB_USER")};" +
-                             $"Password={Environment.GetEnvironmentVariable("DB_PASSWORD_SERVER")};" +  
-                             $"Database={Environment.GetEnvironmentVariable("DB_NAME")};" +
-                             "TrustServerCertificate=True;";
+        //  var connectionString=$"Server={Environment.GetEnvironmentVariable("DB_HOST_SERVER")};" +
+        //                      $"User Id={Environment.GetEnvironmentVariable("DB_USER")};" +
+        //                      $"Password={Environment.GetEnvironmentVariable("DB_PASSWORD_SERVER")};" +  
+        //                      $"Database={Environment.GetEnvironmentVariable("DB_NAME")};" +
+        //                      "TrustServerCertificate=True;";
+        
+        var connectionString=$"Server=192.168.1.45;" +
+                              $"User Id='Sa';" +
+                              $"Password='bcsm@122#';" + 
+                              $"Database='SOUTTOMAYOR';" +
+                              "TrustServerCertificate=True;";
 
         optionsBuilder.UseSqlServer(connectionString); 
     }
@@ -35,6 +41,7 @@ public class PrincipalDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ProdutoServico>().HasNoKey();
+        modelBuilder.Entity<RelacaoServicoProduto>().HasNoKey();
         modelBuilder.Entity<TpaCadastroDTO>().ToTable(tb => tb.UseSqlOutputClause(false));
         modelBuilder.Entity<TpaEnderecoDTO>().ToTable(tb => tb.UseSqlOutputClause(false));
         modelBuilder.Entity<TpaContatoDTO>().ToTable(tb => tb.UseSqlOutputClause(false));

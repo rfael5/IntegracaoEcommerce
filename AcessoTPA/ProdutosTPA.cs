@@ -263,6 +263,44 @@ public class ProdutosTPA
         };
     }
 
+    public async Task<PagedResponse<RelacaoServicoProduto>> GetRelacaoServicoProduto(
+        QueryFilter filter,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var pageNumber = Math.Max(1, filter.PageNumber);
+        var pageSize = Math.Clamp(filter.PageSize, 1, 1000);
+        var offset = (pageNumber - 1) * pageSize;
+
+        const string _query = @$"
+            
+            SELECT RDX_EVENTOSV as idItemServico, IDX_PRODUTO as idProduto 
+                FROM TPAPRODEVENTOSV
+            ORDER BY RDX_EVENTOSV    
+            OFFSET @offset ROWS 
+            FETCH NEXT @pageSize ROWS ONLY
+        ";
+
+        const string count = @$"
+        SELECT COUNT(*) AS Value FROM TPAPRODEVENTOSV
+        ";
+
+        var totalRecords = await _dbPrincipal.Database.SqlQueryRaw<int>(count).SingleAsync(cancellationToken);
+        var relacaoServicoProduto = await _dbPrincipal.Database.SqlQueryRaw<RelacaoServicoProduto>(_query,
+                new SqlParameter("@offset", offset),
+                new SqlParameter("@pageSize", pageSize))
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+
+        return new PagedResponse<RelacaoServicoProduto>
+        {
+            Data = relacaoServicoProduto,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalRecords = totalRecords,
+            TotalPages = (int)Math.Ceiling(totalRecords / (double)pageSize)
+        };
+    }
     public async Task<PagedResponse<ItemServico>> GetItensServico()
     {
         const string _query = @$"

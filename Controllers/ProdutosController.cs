@@ -184,6 +184,47 @@ public class ProdutosController:ControllerBase
         }
     }
 
+    [HttpGet("relacao-servico-produto")]
+    public async Task<IActionResult> BuscarRelacaoServicoProduto([FromQuery] QueryFilter filter, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var relacaoServicosProdutos = await _produtos.GetRelacaoServicoProduto(filter, cancellationToken);
+            return Ok(new PagedResponseData
+            {
+                status = 200,
+                message = "OK",
+                data = relacaoServicosProdutos.Data,
+                pageNumber = relacaoServicosProdutos.PageNumber,
+                pageSize = relacaoServicosProdutos.PageSize,
+                totalPages = relacaoServicosProdutos.TotalPages,
+                totalRecords = relacaoServicosProdutos.TotalRecords,
+                hasNextPage = relacaoServicosProdutos.HasNextPage,
+                hasPreviousPage = relacaoServicosProdutos.HasPreviousPage  
+            });
+        }
+        catch(HttpRequestException e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(
+                (int?)e.StatusCode ?? 500,
+                new ResponseData
+                {
+                    status = (int?)e.StatusCode ?? 500,
+                    message = e.Message
+                });
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(500, new ResponseData
+            {
+                status = 500,
+                message = e.InnerException?.Message ?? e.Message
+            });
+        }
+    }
+
     [HttpGet("itens-servico")]
     public async Task<IActionResult> BuscarItensServico()
     {

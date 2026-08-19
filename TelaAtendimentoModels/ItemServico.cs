@@ -16,3 +16,9 @@ public class ItemServico
     public string tpImpressaoMsg { get; set; }
     public string tpRegistroItens { get; set; }
 }
+
+public record RelacaoServicoProduto
+{
+    public string idItemServico { get; init; }
+    public string idProduto { get; init; }
+}
