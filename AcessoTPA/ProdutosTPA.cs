@@ -52,7 +52,9 @@ public class ProdutosTPA
             .SingleAsync(cancellationToken);
         
         var produtos = await _dbPrincipal.ProdutosServico.FromSqlRaw(_query,
-            new SqlParameter("tipoServico", idTipoServico))
+                new SqlParameter("tipoServico", idTipoServico),
+                new SqlParameter("@offset", offset),
+                new SqlParameter("@pageSize", pageSize))
             .AsNoTracking()
             .ToListAsync();
 
