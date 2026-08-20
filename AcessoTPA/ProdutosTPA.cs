@@ -12,6 +12,73 @@ public class ProdutosTPA
         _dbPrincipal = dbPrincipal;
     }
 
+    public async Task<PagedResponse<ProdutoServico>> GetProdutosPorItemServico(int idTipoServico, QueryFilter filter, CancellationToken cancellationToken = default)
+    {
+        var pageNumber = Math.Max(1, filter.PageNumber);
+        var pageSize = Math.Clamp(filter.PageSize, 1, 100);
+        var offset = (pageNumber - 1) * pageSize;
+
+        const string _query = @"
+            SELECT PRODSV.PK_PRODEVENTOSV as prodEventoSv, TPSV.ID as idTipoServico, TPSV.DESCRICAO as itemServico, PRODUTO.PK_PRODUTO as pkProduto, 
+            PRODUTO.CODPRODUTO as codProduto, PRODUTO.DESCRICAO AS nomeProduto, PRODUTO.REFERENCIA as referencia, PRODUTO.UN1 as un, 
+            PRODUTO.IDX_NEGOCIO as idxNegocio, PRODUTO.IDX_CLASSIFICACAO as idxClassificacao, PRODUTO.CSTI as csti, PRODUTO.PCCUSTO as pcCusto, 
+            PRODUTO.LOCACAO as locacao, PRODUTO.NCM as ncm, PRODUTO.ENCOMENDA AS permiteEncomenda
+                FROM TPAPRODEVENTOSV as PRODSV
+            INNER JOIN TPAEVENTOSV AS TPSV ON PRODSV.RDX_EVENTOSV = TPSV.PK_EVENTOSV
+            INNER JOIN TPAPRODUTO AS PRODUTO ON PRODSV.IDX_PRODUTO = PRODUTO.PK_PRODUTO
+                AND PRODUTO.IDX_NEGOCIO NOT IN ('Desativados')
+                AND PRODUTO.STATUS = 'A'
+                AND PRODUTO.VENDA = 'S'
+                AND TPSV.ID = @tipoServico
+            ORDER BY PRODSV.PK_PRODEVENTOSV 
+            OFFSET @offset ROWS 
+            FETCH NEXT @pageSize ROWS ONLY
+        ";
+
+        const string count = @"
+            SELECT COUNT(*) AS Value
+                FROM TPAPRODEVENTOSV as PRODSV
+            INNER JOIN TPAEVENTOSV AS TPSV ON PRODSV.RDX_EVENTOSV = TPSV.PK_EVENTOSV
+            INNER JOIN TPAPRODUTO AS PRODUTO ON PRODSV.IDX_PRODUTO = PRODUTO.PK_PRODUTO 
+                AND PRODUTO.IDX_NEGOCIO NOT IN ('Desativados')
+                AND PRODUTO.STATUS = 'A'
+                AND PRODUTO.VENDA = 'S'
+                AND TPSV.ID = @tipoServico
+        ";
+
+        var totalRecords = await _dbPrincipal.Database
+            .SqlQueryRaw<int>(count,
+                new SqlParameter("@tipoServico", idTipoServico))
+            .SingleAsync(cancellationToken);
+        
+        var produtos = await _dbPrincipal.ProdutosServico.FromSqlRaw(_query,
+            new SqlParameter("tipoServico", idTipoServico))
+            .AsNoTracking()
+            .ToListAsync();
+
+        foreach (var produto in produtos)
+        {
+            produto.itemServico = produto.itemServico?.Replace("\0", "");
+            produto.codProduto = produto.codProduto?.Replace("\0", "");
+            produto.nomeProduto = produto.nomeProduto?.Replace("\0", "");
+            produto.referencia = produto.referencia?.Replace("\0", "");
+            produto.un = produto.un?.Replace("\0", "");
+            produto.idxNegocio = produto.idxNegocio?.Replace("\0", "");
+            produto.idxClassificacao = produto.idxClassificacao?.Replace("\0", "");
+            produto.locacao = produto.locacao?.Replace("\0", "");
+            produto.ncm = produto.ncm?.Replace("\0", "");
+        }
+
+        return new PagedResponse<ProdutoServico>
+        {
+            Data = produtos,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalRecords = totalRecords,
+            TotalPages = (int)Math.Ceiling(totalRecords / (double)pageSize)           
+        };
+    }
+
     public async Task<PagedResponse<ProdutoServico>> GetProdutoPorServico(QueryFilter filter, CancellationToken cancellationToken = default)
     {
         var pageNumber = Math.Max(1, filter.PageNumber);

@@ -14,6 +14,11 @@ public class ProdutosController:ControllerBase
        _produtos = produtos;
     }
 
+    public record ProdutosItemServicoRequest
+    {
+        public int idItemServico { get; init; }
+    }
+
     [EnableCors("All")]
     [HttpGet("produtos-servico")]
     public async Task<IActionResult> BuscarProdutosServico([FromQuery] QueryFilter filter, CancellationToken cancellationToken)
@@ -22,6 +27,50 @@ public class ProdutosController:ControllerBase
         {
             GetClientIpAddress();
             var produtosServico = await _produtos.GetProdutoPorServico(filter, cancellationToken);
+            return Ok(new PagedResponseData
+            {
+                status = 200,
+                message = "OK",
+                data = produtosServico.Data,
+                pageNumber = produtosServico.PageNumber,
+                pageSize = produtosServico.PageSize,
+                totalPages = produtosServico.TotalPages,
+                totalRecords = produtosServico.TotalRecords,
+                hasNextPage = produtosServico.HasNextPage,
+                hasPreviousPage = produtosServico.HasPreviousPage
+            });
+        }
+        catch(HttpRequestException e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(
+                (int?)e.StatusCode ?? 500,
+                new ResponseData
+                {
+                    status = (int?)e.StatusCode ?? 500,
+                    message = e.Message
+                });
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(500, new ResponseData
+            {
+                status = 500,
+                message = e.InnerException?.Message ?? e.Message
+            });
+        }
+    }
+
+    [HttpPost("produtos-por-servico")]
+    public async Task<IActionResult> BuscarProdutosPorItemServico(
+            [FromQuery] QueryFilter filter, 
+            CancellationToken cancellationToken,
+            [FromBody] ProdutosItemServicoRequest request)
+    {
+        try
+        {
+            var produtosServico = await _produtos.GetProdutosPorItemServico(request.idItemServico, filter, cancellationToken);
             return Ok(new PagedResponseData
             {
                 status = 200,
