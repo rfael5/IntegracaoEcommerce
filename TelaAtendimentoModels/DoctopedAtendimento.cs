@@ -28,7 +28,11 @@ public record DoctopedAtendimento
     [Column("IDX_VENDEDOR2")]
     public string? idxVendedor2 { get; init; } // ID do assistente
     [Column("TEXTO")]
-    public string? texto { get; init; } // Observações do vendedor 
+    public string? texto { get; init; } // Observações externas
+    [Column("TXTHISTORICO")]
+    public string? txtHistorico { get; init; } // Observações internas
+    [Column("TXTCONCLUSAO")]
+    public string? txtConclusao { get; init; } // Observações faturamento
     [Column("TOTALDOCTO")]
     public decimal totalDocto { get; init; } // Valor total do evento
     [Column("PRODVALOR")]
