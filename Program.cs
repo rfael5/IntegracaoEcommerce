@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
+using JsonPatchSample;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,7 +34,11 @@ builder.Services.AddScoped<ProdutosTPA>();
 builder.Services.AddScoped<ServicosTPA>();
 builder.Services.AddScoped<Ajustes>();
 builder.Services.AddScoped<GeracaoContrato>();
-builder.Services.AddControllers();
+builder.Services.AddScoped<BuscaDadosOrcamentos>();
+builder.Services.AddControllers(options =>
+{
+    options.InputFormatters.Insert(0, MyJPIF.GetJsonPatchInputFormatter());
+});
 
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
@@ -43,6 +49,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
 
 builder.Services.AddDbContext<PrincipalDbContext>(options => 
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
+
+builder.Services.AddDbContext<BancoTesteLocal>(options => 
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
+
+builder.Services.AddDbContext<BancoPrincipal>(options => 
     options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
 
 builder.Services.AddHttpContextAccessor();

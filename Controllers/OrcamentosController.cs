@@ -10,18 +10,21 @@ public class OrcamentosController:ControllerBase
     private readonly AcessoTPA _acessoTpa;
     private readonly GeracaoContrato _geracaoContrato;
     private readonly CadastroPedido _cadastroPedido;
+    private readonly BuscaDadosOrcamentos _buscaOrcamentos;
     private readonly AppDbContext _context;
 
     public OrcamentosController(
         AcessoTPA acessoTpa, 
         GeracaoContrato geracaoContrato,
         CadastroPedido cadastroPedido,
+        BuscaDadosOrcamentos buscaOrcamentos,
         AppDbContext context)
     {
         _acessoTpa = acessoTpa;
         _geracaoContrato = geracaoContrato;
         _cadastroPedido = cadastroPedido;
         _context = context;
+        _buscaOrcamentos = buscaOrcamentos;
     }
 
     public record DadosFechamentoContrato
@@ -281,6 +284,88 @@ public class OrcamentosController:ControllerBase
                     message = e.InnerException?.Message ?? e.Message
                 }
             );
+        }
+    }
+
+    [HttpGet("buscar-ors")]
+    public async Task<IActionResult> BuscarORs([FromQuery] QueryFilter filter, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var ors = await _buscaOrcamentos.BuscarORs(filter, cancellationToken);
+             return Ok(new PagedResponseData
+            {
+                status = 200,
+                message = "OK",
+                data = ors.Data,
+                pageNumber = ors.PageNumber,
+                pageSize = ors.PageSize,
+                totalPages = ors.TotalPages,
+                totalRecords = ors.TotalRecords,
+                hasNextPage = ors.HasNextPage,
+                hasPreviousPage = ors.HasPreviousPage
+            });
+
+        }catch(HttpRequestException e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(
+                (int?)e.StatusCode ?? 500,
+                new ResponseData
+                {
+                    status = (int?)e.StatusCode ?? 500,
+                    message = e.Message
+                });
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(500, new ResponseData
+            {
+                status = 500,
+                message = e.InnerException?.Message ?? e.Message
+            });
+        }
+    }
+
+    [HttpGet("buscar-produtos-ors")]
+    public async Task<IActionResult> BuscarProdutosORs([FromQuery] QueryFilter filter, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var produtosOrs = await _buscaOrcamentos.BuscarProdutosORs(filter, cancellationToken);
+            return Ok(new PagedResponseData
+            {
+                status = 200,
+                message = "OK",
+                data = produtosOrs.Data,
+                pageNumber = produtosOrs.PageNumber,
+                pageSize = produtosOrs.PageSize,
+                totalPages = produtosOrs.TotalPages,
+                totalRecords = produtosOrs.TotalRecords,
+                hasNextPage = produtosOrs.HasNextPage,
+                hasPreviousPage = produtosOrs.HasPreviousPage
+            });
+
+        }catch(HttpRequestException e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(
+                (int?)e.StatusCode ?? 500,
+                new ResponseData
+                {
+                    status = (int?)e.StatusCode ?? 500,
+                    message = e.Message
+                });
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(500, new ResponseData
+            {
+                status = 500,
+                message = e.InnerException?.Message ?? e.Message
+            });
         }
     }
 }
