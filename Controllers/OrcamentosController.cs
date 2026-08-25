@@ -47,6 +47,11 @@ public class OrcamentosController:ControllerBase
         public object? data  { get; init; } = null;
     }
 
+    public record RequestProdutoEvento
+    {
+        public string idDoctoped { get; init; }
+    }
+
     public async Task<bool> ChecarDocumentoExiste(int pkDoctoped)
     {
         var documento = await _context.Doctoped.FirstOrDefaultAsync(doc => doc.pkDoctoped == pkDoctoped);
@@ -329,22 +334,19 @@ public class OrcamentosController:ControllerBase
     }
 
     [HttpGet("buscar-produtos-ors")]
-    public async Task<IActionResult> BuscarProdutosORs([FromQuery] QueryFilter filter, CancellationToken cancellationToken)
+    public async Task<IActionResult> BuscarProdutosORs(
+        [FromQuery] RequestProdutoEvento request, 
+        CancellationToken cancellationToken)
     {
         try
         {
-            var produtosOrs = await _buscaOrcamentos.BuscarProdutosORs(filter, cancellationToken);
-            return Ok(new PagedResponseData
+            int idDoctoped = int.Parse(request.idDoctoped);
+            var produtosOr = await _buscaOrcamentos.BuscarProdutosORs(idDoctoped, cancellationToken);
+            return Ok(new ResponseData
             {
                 status = 200,
-                message = "OK",
-                data = produtosOrs.Data,
-                pageNumber = produtosOrs.PageNumber,
-                pageSize = produtosOrs.PageSize,
-                totalPages = produtosOrs.TotalPages,
-                totalRecords = produtosOrs.TotalRecords,
-                hasNextPage = produtosOrs.HasNextPage,
-                hasPreviousPage = produtosOrs.HasPreviousPage
+                message="Ok",
+                data = produtosOr
             });
 
         }catch(HttpRequestException e)

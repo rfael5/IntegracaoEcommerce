@@ -41,32 +41,14 @@ public class BuscaDadosOrcamentos
         };
     }
     
-    public async Task<PagedResponse<TpaMovtopedDTO>> BuscarProdutosORs(QueryFilter filter, CancellationToken cancellationToken)
+    public async Task<List<TpaMovtopedDTO>> BuscarProdutosORs(int idDoctoped, CancellationToken cancellationToken)
     {
-        var pageNumber = Math.Max(1, filter.PageNumber);
-        var pageSize = Math.Clamp(filter.PageSize, 1, 100);
-        var offset = (pageNumber - 1) * pageSize;
-        var idDoctopeds = await _bancoPrincipal.Doctoped
-            .Where(doc => doc.dtPrevisao >= dataInicio 
-            && doc.tpDocto == "OR" 
-            && (doc.situacao == "V" ||
-                    doc.situacao == "N" ||
-                    doc.situacao == "C"))
-            .Select(doc => doc.pkDoctoped)
+        //var queryMovtoped = _bancoPrincipal.Movtoped.FromSqlRaw($"SELECT * FROM dbo.TPAMOVTOPED WHERE RDX_DOCTOPED IN ({(idDoctopeds.Count > 0 ? string.Join(',', idDoctopeds) : "NULL")})").AsNoTracking();
+        var produtosEvento = await _bancoPrincipal.Movtoped
+            .Where(mov => mov.rdxDoctoped == idDoctoped)
+            .AsNoTracking()
             .ToListAsync(cancellationToken);
-        
-        var queryMovtoped = _bancoPrincipal.Movtoped.FromSqlRaw($"SELECT * FROM dbo.TPAMOVTOPED WHERE RDX_DOCTOPED IN ({(idDoctopeds.Count > 0 ? string.Join(',', idDoctopeds) : "NULL")})").AsNoTracking();
 
-        var totalRecords = await queryMovtoped.CountAsync(cancellationToken);
-        var produtosEventos = await queryMovtoped.OrderBy(mov => mov.rdxDoctoped).Skip(offset).Take(pageSize).ToListAsync(cancellationToken);
-
-        return new PagedResponse<TpaMovtopedDTO>
-        {
-            Data = produtosEventos,
-            PageNumber = pageNumber,
-            PageSize = pageSize,
-            TotalRecords = totalRecords,
-            TotalPages = (int)Math.Ceiling(totalRecords / (double)pageSize)
-        };
+        return produtosEvento;
     }
 }
