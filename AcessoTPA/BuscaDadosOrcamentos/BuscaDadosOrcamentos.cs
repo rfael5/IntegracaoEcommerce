@@ -43,7 +43,6 @@ public class BuscaDadosOrcamentos
     
     public async Task<List<TpaMovtopedDTO>> BuscarProdutosORs(int idDoctoped, CancellationToken cancellationToken)
     {
-        //var queryMovtoped = _bancoPrincipal.Movtoped.FromSqlRaw($"SELECT * FROM dbo.TPAMOVTOPED WHERE RDX_DOCTOPED IN ({(idDoctopeds.Count > 0 ? string.Join(',', idDoctopeds) : "NULL")})").AsNoTracking();
         var produtosEvento = await _bancoPrincipal.Movtoped
             .Where(mov => mov.rdxDoctoped == idDoctoped)
             .AsNoTracking()
