@@ -32,6 +32,7 @@ public class BancoPrincipal : DbContext
     public DbSet<TpaEnderecoDTO> Enderecos { get; set; }
     public DbSet<TpaContatoDTO> Contatos { get; set; }
     public DbSet<InformacoesProdutoTPA> Produto { get; set; }
+    public DbSet <InfoFaturamento> Faturamento { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ProdutoServico>().HasNoKey();

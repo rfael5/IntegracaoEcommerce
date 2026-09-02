@@ -69,6 +69,7 @@ public class AppDbContext : DbContext
     public DbSet<TpaDoctopedHistoricoDTO> DoctopedHistorico { get; set; }
    public DbSet<ServicoMateriais> ServicosMateriais { get; set; }
    public DbSet<TpaContratoAdendoDTO> ContratosAdendos { get; set; }
+   public DbSet <InfoFaturamento> Faturamento { get; set; }
    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

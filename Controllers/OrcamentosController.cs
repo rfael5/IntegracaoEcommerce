@@ -370,4 +370,52 @@ public class OrcamentosController:ControllerBase
             });
         }
     }
+
+    [HttpGet("dados-faturamento")]
+    public async Task<IActionResult> BuscarDadosFaturamento(
+        [FromQuery] RequestProdutoEvento request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            int idDoctoped = int.Parse(request.idDoctoped);
+            var faturamento = await _buscaOrcamentos.BuscarDadosFaturamento(idDoctoped, cancellationToken);
+            if(faturamento == null)
+            {
+                return Ok(new ResponseData
+                    {
+                        status = 200,
+                        message = "Documento não encontrado",
+                        data = null
+                    }
+                );
+            }
+            return Ok(new ResponseData
+            {
+                status = 200,
+                message = "Ok",
+                data = faturamento
+            });
+        }
+        catch(HttpRequestException e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(
+                (int?)e.StatusCode ?? 500,
+                new ResponseData
+                {
+                    status = (int?)e.StatusCode ?? 500,
+                    message = e.Message
+                });
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(500, new ResponseData
+            {
+                status = 500,
+                message = e.InnerException?.Message ?? e.Message
+            });
+        }
+    }
 }

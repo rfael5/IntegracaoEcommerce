@@ -1,3 +1,4 @@
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 
 public class BuscaDadosOrcamentos
@@ -49,5 +50,48 @@ public class BuscaDadosOrcamentos
             .ToListAsync(cancellationToken);
 
         return produtosEvento;
+    }
+    
+    public async Task<InfoFaturamento?> BuscarDadosFaturamento(int idDoctoped, CancellationToken cancellationToken)
+    {
+        const string _query = @$"
+            WITH OR_MES AS (
+            SELECT DISTINCT
+                PED.PK_DOCTOPED,
+                PED.TPDOCTO,
+                PED.DOCUMENTO,
+                PED.IDX_VENDEDOR1,
+                PED.TOTALDOCTO,
+                CTR.PK_CONTRATOMOV,
+                CAST(CTR.DTINICIO AS DATE) AS DATA
+            FROM SOUTTOMAYOR.dbo.TPADOCTOPED PED
+            INNER JOIN SOUTTOMAYOR.dbo.TPACONTRATOMOV CTR
+                ON CTR.IDX_DOCTOEST = PED.PK_DOCTOPED
+                AND CTR.STATUS = 'A'
+            WHERE PED.PK_DOCTOPED = @idDoctoped
+        )
+        SELECT
+            O.PK_DOCTOPED as pkDoctoped,
+        O.DOCUMENTO as documento,
+        O.TOTALDOCTO as totalDocto,
+            SUM(COALESCE(P.VALORPAGO, 0)) AS valorBaixado
+        FROM OR_MES O
+        INNER JOIN SOUTTOMAYOR.dbo.TPADESPESA D
+            ON D.CONTRATOMOV = O.PK_CONTRATOMOV
+        INNER JOIN SOUTTOMAYOR.dbo.TPADESPESAPARC P
+            ON P.RDX_DESPESA = D.PK_DESPESA
+            AND P.SITUACAO = 'P'
+        GROUP BY
+        O.DOCUMENTO,
+        O.TOTALDOCTO,
+        O.PK_DOCTOPED;";
+
+        var faturamento = await _bancoPrincipal.Faturamento
+            .FromSqlRaw(_query, new SqlParameter("@idDoctoped", idDoctoped))
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+            //.SingleOrDefaultAsync(cancellationToken);
+
+        return faturamento.SingleOrDefault();
     }
 }
