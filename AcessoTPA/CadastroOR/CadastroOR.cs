@@ -124,17 +124,17 @@ public class CadastroPedido
             operacao = doctoped.tpDocto == "OR" ? "OV" : "PV",
             tpDocto = doctoped.tpDocto,
             documento = numeroDocumento,
-            idxEntidade = doctoped.idxEntidade,
+            idxEntidade = doctoped.idxEntidade?.PadLeft(12),
             nome = doctoped.nome,
             cnpjCpf = doctoped.cnpjCpf,
             cidade = doctoped.cidade,
             uf = doctoped.uf,
             idxDepto = doctoped.idxDepto,
-            idxTabela = doctoped.idxTabela,
-            idxTabelaSub = doctoped.idxTabelaSub,
-            idxFormaPag = doctoped.idxFormaPag,
-            idxVendedor1 = doctoped.idxVendedor1,
-            idxVendedor2 = doctoped.idxVendedor2,
+            idxTabela = doctoped.idxTabela?.PadLeft(12),
+            idxTabelaSub = doctoped.idxTabelaSub?.PadLeft(12),
+            idxFormaPag = doctoped.idxFormaPag?.PadLeft(12),
+            idxVendedor1 = doctoped.idxVendedor1 != null ? doctoped.idxVendedor1.PadLeft(12) : null,
+            idxVendedor2 = doctoped.idxVendedor2?.PadLeft(12),
             texto = doctoped.texto,
             totalDocto = doctoped.totalDocto,
             prodValor = doctoped.prodValor,
@@ -143,7 +143,7 @@ public class CadastroPedido
             freteValor = doctoped.freteValor,
             servValor = doctoped.servValor,
             servTotal = doctoped.servTotal,
-            situacao = doctoped.situacao,
+            situacao = doctoped.tpDocto == "OR" ? "V" : "Z",
             temProduto = doctoped.temProduto,
             temServico = doctoped.temServico,
             temLocacao = doctoped.temLocacao,
@@ -174,7 +174,12 @@ public class CadastroPedido
         return novaOR;
     }
 
-    public async Task<TpaMovtopedDTO> CadastrarMovtoped(MovtopedAtendimento movtoped, int _rdxDoctoped, TpaEventoOrcPedDTO? orcPed = null)
+    public async Task<TpaMovtopedDTO> CadastrarMovtoped(
+        MovtopedAtendimento movtoped, 
+        int _rdxDoctoped, 
+        int sequenciaMovtoped,
+        TpaEventoOrcPedDTO? orcPed = null
+    )
     {
         var dadosProduto = await GetDadosProduto(movtoped.idxProduto);
         Console.WriteLine(JsonSerializer.Serialize(dadosProduto));
@@ -182,7 +187,8 @@ public class CadastroPedido
         {
             rdxDoctoped = _rdxDoctoped,
             idxDepto = movtoped.idxDepto,
-            codProduto = movtoped.codProduto,
+            item = sequenciaMovtoped,
+            codProduto = dadosProduto.codProduto,
             descricao = movtoped.descricao,
             referencia = movtoped.referencia,
             tipoProd = movtoped.tipoProd,
@@ -242,9 +248,10 @@ public class CadastroPedido
         try
         {
             var doctoped = await CadastrarDoctoped(informacoesEc.doctopedAtendimento);
+            var sequenciaMovtoped = 1;
             foreach (var produto in informacoesEc.movtopedAtendimento)
             {
-                var movtoped = await CadastrarMovtoped(produto, doctoped.pkDoctoped);
+                var movtoped = await CadastrarMovtoped(produto, doctoped.pkDoctoped, sequenciaMovtoped++);
                 _context.Movtoped.Add(movtoped);
             }
 
@@ -280,9 +287,10 @@ public class CadastroPedido
             foreach (var orcPed in informacoesOr.eventoOrcPedAtendimento)
             {
                 var _eventoOrcPed = await CadastrarEventoOrcPed(orcPed, doctoped.pkDoctoped, sequenciaOrcPed++);
+                int sequenciaMovtoped = 1;
                 foreach (var produto in orcPed.produtos)
                 {
-                    var movtoped = await CadastrarMovtoped(produto, doctoped.pkDoctoped, _eventoOrcPed);
+                    var movtoped = await CadastrarMovtoped(produto, doctoped.pkDoctoped, sequenciaMovtoped++, _eventoOrcPed);
                     _context.Movtoped.Add(movtoped);
                 }
             }
@@ -593,9 +601,10 @@ public class CadastroPedido
             foreach (var orcPed in informacoesOr.eventoOrcPedAtendimento)
             {
                 var _eventoOrcPed = await CadastrarEventoOrcPed(orcPed, doctoped.pkDoctoped, sequenciaOrcPed++);
+                var sequenciaMovtoped = 1;
                 foreach (var produto in orcPed.produtos)
                 {
-                    var movtoped = await CadastrarMovtoped(produto, doctoped.pkDoctoped, _eventoOrcPed);
+                    var movtoped = await CadastrarMovtoped(produto, doctoped.pkDoctoped, sequenciaMovtoped++, _eventoOrcPed);
                     _context.Movtoped.Add(movtoped);
                 }
             }
