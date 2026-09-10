@@ -78,7 +78,7 @@ public class UsuariosTPA
             nome = dadosCliente.nomeCliente,
             fantasia = dadosCliente.nomeCliente,
             cnpjCpf = dadosCliente.cpf_cnpj,
-            sexo = "M",
+            sexo = "",
             estadoCivil = "",
             naturalCidade = dadosCliente.cidade,
             naturalUf = dadosCliente.estado,

@@ -46,6 +46,7 @@ public record DadosProduto
     public decimal total { get; init; }
 }
 
+
 public record DadosEntrega
 {
     public required string rua { get; init; }
@@ -69,7 +70,7 @@ public record DadosCliente
     public required string telefone { get; init; }
     public required string celular { get; init; }
     public required string pessoa_fj { get; init; }
-    public string cpf_cnpj { get; init; } = "14726676032";
+    public string? cpf_cnpj { get; init; } 
     public required string nascimento { get; init; }
     public required string genero { get; init; }
 }
