@@ -40,6 +40,12 @@ public class UserController:ControllerBase
         public object? data { get; set; } = null;
     }
 
+    public record CadastroUsuarioRequest
+    {
+        public required DadosCliente dadosCliente { get; init; }
+        public required DadosEntrega dadosEntrega { get; init; }
+    }
+
     [EnableCors("All")]
     [HttpGet("codigo-usuario")]
     public async Task<IActionResult> Teste()
@@ -253,5 +259,12 @@ public class UserController:ControllerBase
     {
         var result = await _usuariosTpa.VerUsuario();
         return Ok(result);
+    }
+
+    [HttpPost("cadastrar-usuario")]
+    public async Task<IActionResult> CadastrarUsuario([FromBody] CadastroUsuarioRequest request)
+    {
+        var result = await _usuariosTpa.BuscarUsuario(request.dadosCliente, request.dadosEntrega);
+        return Ok("ok");
     }
 }

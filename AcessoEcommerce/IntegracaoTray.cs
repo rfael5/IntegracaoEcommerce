@@ -299,7 +299,7 @@ public class IntegracaoTray
             celular = JsonExtensions.RequireString(dadosEntrega, "cellphone"), 
             pessoa_fj =  JsonExtensions.RequireString(dadosEntrega, "cpf"), 
             nascimento = BrazilTime.Now().ToString(), 
-            genero = "N" 
+            genero = "N"
         };
     }
 
