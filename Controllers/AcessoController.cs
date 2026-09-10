@@ -264,7 +264,37 @@ public class UserController:ControllerBase
     [HttpPost("cadastrar-usuario")]
     public async Task<IActionResult> CadastrarUsuario([FromBody] CadastroUsuarioRequest request)
     {
-        var result = await _usuariosTpa.BuscarUsuario(request.dadosCliente, request.dadosEntrega);
-        return Ok("ok");
+        try
+        {
+            var result = await _usuariosTpa.BuscarUsuario(request.dadosCliente, request.dadosEntrega);
+            return Ok(new ResponseData
+            {
+                status = 200,
+                message = "OK",
+                data = result.pkCadastro
+            });
+        }
+        catch (HttpRequestException e)
+        {
+            Console.WriteLine(e);
+
+            return StatusCode(
+                (int?)e.StatusCode ?? 500,
+                new ResponseData
+                {
+                    status = (int?)e.StatusCode ?? 500,
+                    message = e.Message
+                });
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+
+            return StatusCode(500, new ResponseData
+            {
+                status = 500,
+                message = e.InnerException?.Message ?? e.Message
+            });
+        }
     }
 }
