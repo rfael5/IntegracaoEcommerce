@@ -81,15 +81,13 @@ public class AcessoEcommerce
                     nomeCliente = $"{JsonExtensions.RequireString(billing, "first_name")} {JsonExtensions.RequireString(billing, "last_name")}",
                     cidade = JsonExtensions.RequireString(billing, "city" ), // billing.GetProperty("city").GetString(),
                     estado = JsonExtensions.RequireString(billing, "state" ), // billing.GetProperty("state").GetString(),
-                    cep = JsonExtensions.RequireString(billing, "postcode" ), // billing.GetProperty("postcode").GetString(),
                     pais = JsonExtensions.RequireString(billing, "country" ), // billing.GetProperty("country").GetString(),
                     email = JsonExtensions.RequireString(billing, "email" ), // billing.GetProperty("email").GetString(),
                     telefone = JsonExtensions.RequireString(billing, "phone" ), // billing.GetProperty("phone").GetString(),
-                    celular = JsonExtensions.RequireString(billing, "cellphone" ), // billing.TryGetProperty("cellphone", out var c) ? c.GetString() : null,
-                    pessoa_fj = JsonExtensions.RequireString(billing, "persontype" ), // billing.GetProperty("persontype").GetString(),
-                    //cpf_cnpj = JsonExtensions.RequireString(billing, "persontype" ) == "F" ? JsonExtensions.RequireString(billing, "cpf" ) : JsonExtensions.RequireString(billing, "cnpj" ), 
-                    nascimento = JsonExtensions.RequireString(billing, "birthdate" ), // billing.TryGetProperty("birthdate", out var d) ? d.GetString() : null,
-                    genero = JsonExtensions.RequireString(billing, "gender" ) // billing.TryGetProperty("gender", out var g) ? g.GetString() : null
+                    pessoaFj = JsonExtensions.RequireString(billing, "persontype" ), // billing.GetProperty("persontype").GetString(),
+                    cnpjCpf = JsonExtensions.RequireString(billing, "persontype" ) == "F" ? JsonExtensions.RequireString(billing, "cpf" ) : JsonExtensions.RequireString(billing, "cnpj" ), 
+                    dtNascimento = JsonExtensions.RequireString(billing, "birthdate" ), // billing.TryGetProperty("birthdate", out var d) ? d.GetString() : null,
+                    sexo = JsonExtensions.RequireString(billing, "gender" ) // billing.TryGetProperty("gender", out var g) ? g.GetString() : null
                 },
 
                 produtos = CriarObjetoProdutos(line_items)

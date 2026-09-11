@@ -32,7 +32,7 @@ public record TpaCadastroDTO
     [Column("AGENDA")]
     public string agenda { get; init; } = "S";
     [Column("PESSOAFJ")]
-    public string pessoaFj { get; init; } = "F";
+    public string pessoafj { get; init; } = "F";
     [Column("CNPJCPF")]
     public required string cnpjCpf { get; init; }
     [Column("INSCCI")]

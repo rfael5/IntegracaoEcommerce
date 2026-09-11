@@ -292,14 +292,12 @@ public class IntegracaoTray
             nomeCliente = JsonExtensions.RequireString(dadosEntrega, "name"),
             cidade = JsonExtensions.RequireString(enderecoCliente, "city"), 
             estado = JsonExtensions.RequireString(enderecoCliente, "state"), 
-            cep = JsonExtensions.RequireString(enderecoCliente, "zip_code"), 
             pais = JsonExtensions.RequireString(enderecoCliente, "country"), 
             email = JsonExtensions.RequireString(dadosEntrega, "email"), 
             telefone = JsonExtensions.RequireString(dadosEntrega, "phone"), 
-            celular = JsonExtensions.RequireString(dadosEntrega, "cellphone"), 
-            pessoa_fj =  JsonExtensions.RequireString(dadosEntrega, "cpf"), 
-            nascimento = BrazilTime.Now().ToString(), 
-            genero = "N"
+            pessoaFj =  JsonExtensions.RequireString(dadosEntrega, "cpf"), 
+            dtNascimento = BrazilTime.Now().ToString(), 
+            sexo = "M"
         };
     }
 

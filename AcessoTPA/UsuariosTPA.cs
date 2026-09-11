@@ -77,12 +77,12 @@ public class UsuariosTPA
             codCadastro = novoCodigo,
             nome = dadosCliente.nomeCliente,
             fantasia = dadosCliente.nomeCliente,
-            cnpjCpf = dadosCliente.cpf_cnpj,
-            sexo = dadosCliente.genero,
+            cnpjCpf = dadosCliente.cnpjCpf,
+            sexo = dadosCliente.sexo,
             estadoCivil = "",
             naturalCidade = dadosCliente.cidade,
             naturalUf = dadosCliente.estado,
-            telefone1 = dadosCliente.celular,
+            telefone1 = dadosCliente.telefone,
             email = dadosCliente.email,
             opInc = 436,
             opAlt = 436
@@ -140,7 +140,7 @@ public class UsuariosTPA
 
     public async Task<UserKeys> BuscarUsuario(DadosCliente dadosCliente, DadosEntrega dadosEntrega)
     {
-       var userKeys = await ClienteCadastrado(dadosCliente.cpf_cnpj);
+       var userKeys = await ClienteCadastrado(dadosCliente.cnpjCpf);
        if(userKeys.pkCadastro == null)
         {
             var novoUsuario = await CadastrarUsuario(dadosCliente);
@@ -171,7 +171,15 @@ public class UsuariosTPA
             pkCadastro = c.pkCadastro, 
             nome = c.nome, 
             fantasia = c.fantasia, 
-            pessoafj = c.pessoaFj
+            pessoafj = c.pessoafj,
+            cnpjCpf = c.cnpjCpf,
+            naturalCidade = c.naturalCidade,
+            naturalUf = c.naturalUf,
+            pais = c.pais,
+            telefone = c.telefone1,
+            email = c.email,
+            dtNascimento = c.dtNascimento,
+            sexo = c.sexo
         }).ToListAsync(cancellationToken);
 
         //return cadastros;
@@ -220,12 +228,12 @@ public class UsuariosTPA
             codCadastro = novoCodigo,
             nome = dadosCliente.nomeCliente,
             fantasia = dadosCliente.nomeCliente,
-            cnpjCpf = dadosCliente.cpf_cnpj,
+            cnpjCpf = dadosCliente.cnpjCpf,
             sexo = "M",
             estadoCivil = "",
             naturalCidade = dadosCliente.cidade,
             naturalUf = dadosCliente.estado,
-            telefone1 = dadosCliente.celular,
+            telefone1 = dadosCliente.telefone,
             email = dadosCliente.email,
             opInc = 436,
             opAlt = 436
@@ -300,7 +308,7 @@ public class UsuariosTPA
     
     public async Task<UserKeys> BuscarUsuarioTray(DadosCliente dadosCliente, DadosEntrega dadosEntrega)
     {
-       var userKeys = await ClienteCadastradoTray(dadosCliente.cpf_cnpj);
+       var userKeys = await ClienteCadastradoTray(dadosCliente.cnpjCpf);
        if(userKeys.pkCadastro == null)
         {
             var novoUsuario = await CadastrarUsuarioTray(dadosCliente);

@@ -62,17 +62,16 @@ public record DadosEntrega
 public record DadosCliente
 {
     public required string nomeCliente { get; init; }
+    public string? fantasia { get; init; }
     public required string cidade { get; init; }
     public required string estado { get; init; }
-    public required string cep { get; init; }
     public required string pais { get; init; }
     public required string email { get; init; }
     public required string telefone { get; init; }
-    public required string celular { get; init; }
-    public required string pessoa_fj { get; init; }
-    public string? cpf_cnpj { get; init; } 
-    public required string nascimento { get; init; }
-    public required string genero { get; init; }
+    public required string pessoaFj { get; init; }
+    public string? cnpjCpf { get; init; } 
+    public string? dtNascimento { get; init; }
+    public required string sexo { get; init; }
 }
 
 public record UserKeys
