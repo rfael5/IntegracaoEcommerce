@@ -136,6 +136,8 @@ public class CadastroPedido
             idxVendedor1 = doctoped.idxVendedor1 != null ? doctoped.idxVendedor1.PadLeft(12) : null,
             idxVendedor2 = doctoped.idxVendedor2?.PadLeft(12),
             texto = doctoped.texto,
+            txtHistorico = doctoped.txtHistorico,
+            txtConclusao = doctoped.txtConclusao,
             totalDocto = doctoped.totalDocto,
             prodValor = doctoped.prodValor,
             prodDesc = doctoped.prodDesc,
