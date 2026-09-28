@@ -123,26 +123,26 @@ public class AcessoTPA
         var pageSize = Math.Clamp(filter.PageSize, 1, 100);
         var offset = (pageNumber - 1) * pageSize;
 
-        var queryFilter = new QueryFilter();
-        var enderecos = await _context.Enderecos
-            .Where(e => e.tipoTabela == "C")
-            .Select(e =>
-                new EnderecoCliente
-                {
-                    idEndereco = e.pkEndereco,
-                    rua = e.endereco,
-                    numero = e.endNum,
-                    bairro = e.bairro,
-                    cep = e.cep,
-                    cidade = e.cidade,
-                    uf = e.uf,
-                    pais = e.pais,
-                    idxCliente = e.idxTabela,
-                })
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
-        
-        var totalRecords = enderecos.Count;
+        const string _query = @$"
+            SELECT PK_ENDERECO AS idEndereco, ENDERECO AS rua, ENDNUM AS numero,
+            BAIRRO AS bairro, CEP AS cep, CIDADE AS cidade, UF AS uf, PAIS AS pais,
+            IDX_TABELA AS idxCliente 
+                FROM TPAENDERECO 
+            WHERE TIPOTABELA = 'C'
+            ORDER BY PK_ENDERECO
+            OFFSET @offset ROWS
+            FETCH NEXT @pageSize ROWS ONLY
+        ";
+
+        const string count = @"SELECT COUNT(*) AS Value FROM TPAENDERECO WHERE TIPOTABELA = 'C'";
+
+        var totalRecords = await _context.Database.SqlQueryRaw<int>(count).SingleAsync(cancellationToken);
+
+        var enderecos = await _context.Database.SqlQueryRaw<EnderecoCliente>(
+            _query,
+            new SqlParameter("offset", offset),
+            new SqlParameter("pageSize", pageSize)).AsNoTracking().ToListAsync();
+
         
         return new PagedResponse<EnderecoCliente>{
             Data = enderecos,
