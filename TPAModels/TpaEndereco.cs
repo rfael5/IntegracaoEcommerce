@@ -90,3 +90,16 @@ public record TpaEnderecoDTO
     [Column("CODIBGE")]
     public string? codIbge { get; init; } = null;
 }
+
+public record EnderecoCliente
+{
+    public string idEndereco { get; init; }
+    public string rua { get; init; }
+    public string numero { get; init; }
+    public string bairro { get; init; }
+    public string cep { get; init; }
+    public string cidade { get; init; }
+    public string uf { get; init; }
+    public string pais { get; init; }
+    public string idxCliente { get; init; }
+}

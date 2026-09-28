@@ -56,7 +56,7 @@ public record DadosEntrega
     public required string cidade { get; init; }
     public required string estado { get; init; }
     public required string pais { get; init; }
-    public required string telefone { get; init; }
+    public string? telefone { get; init; }
 }
 
 public record DadosCliente

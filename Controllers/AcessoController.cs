@@ -254,6 +254,82 @@ public class UserController:ControllerBase
         }
     }
 
+    [HttpGet("get-enderecos")]
+    public async Task<IActionResult> GetEnderecos([FromQuery] QueryFilter filter, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var result = await _acessoTpa.BuscarEnderecos(filter, cancellationToken);
+            return Ok(new PagedResponseData
+            {
+                status = 200,
+                message = "OK",
+                data = result.Data,
+                pageNumber = result.PageNumber,
+                pageSize = result.PageSize,
+                totalPages = result.TotalPages,
+                totalRecords = result.TotalRecords,
+                hasNextPage = result.HasNextPage,
+                hasPreviousPage = result.HasPreviousPage
+            });
+        }
+        catch (HttpRequestException e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(
+                (int?)e.StatusCode ?? 500,
+                new ResponseData
+                {
+                    status = (int?)e.StatusCode ?? 500,
+                    message = e.Message
+                });
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(500, new ResponseData
+            {
+                status = 500,
+                message = e.InnerException?.Message ?? e.Message
+            });
+        }
+    }
+
+    [HttpGet("enderecos-cliente")]
+    public async Task<IActionResult> GetEnderecos([FromQuery] string idUsuario)
+    {
+        try
+        {
+            var result = await _acessoTpa.BuscarEnderecosEntregaEncomenda(idUsuario);
+            return Ok(new ResponseData
+            {
+                status = 200,
+                message = "OK",
+                data = result
+            });
+        }
+        catch (HttpRequestException e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(
+                (int?)e.StatusCode ?? 500,
+                new ResponseData
+                {
+                    status = (int?)e.StatusCode ?? 500,
+                    message = e.Message
+                });
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(500, new ResponseData
+            {
+                status = 500,
+                message = e.InnerException?.Message ?? e.Message
+            });
+        }
+    }
+
     [HttpGet("get-usuarios")]
     public async Task<IActionResult> VerUsuarios()
     {

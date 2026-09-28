@@ -1,9 +1,11 @@
 using System.Globalization;
+using System.Security.Cryptography;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using WooCommerceNET;
+using WooCommerceNET.WooCommerce.v3;
 
 public class AcessoTPA
 {
@@ -93,6 +95,62 @@ public class AcessoTPA
                 new SqlParameter("@offset", offset), 
                 new SqlParameter("@pageSize", pageSize)).AsNoTracking().ToListAsync(cancellationToken);
         return Materiais;
+    }
+
+    public async Task<List<DadosEntrega>> BuscarEnderecosEntregaEncomenda(string idUsuario)
+    {
+        var enderecosEntrega = await _context.Enderecos
+            .Where(e => e.idxTabela.Trim() == idUsuario.Trim())
+            .Select(e => new DadosEntrega
+            {
+                rua = e.endereco,
+                numero = e.endNum,
+                bairro = e.bairro,
+                cep = e.cep,
+                cidade = e.cidade,
+                estado = e.uf,
+                pais = e.pais
+            })
+            .AsNoTracking()
+            .ToListAsync();
+        
+        return enderecosEntrega;
+    }
+
+    public async Task<PagedResponse<EnderecoCliente>> BuscarEnderecos(QueryFilter filter, CancellationToken cancellationToken = default)
+    {
+        var pageNumber = Math.Max(1, filter.PageNumber);
+        var pageSize = Math.Clamp(filter.PageSize, 1, 100);
+        var offset = (pageNumber - 1) * pageSize;
+
+        var queryFilter = new QueryFilter();
+        var enderecos = await _context.Enderecos
+            .Where(e => e.tipoTabela == "C")
+            .Select(e =>
+                new EnderecoCliente
+                {
+                    idEndereco = e.pkEndereco,
+                    rua = e.endereco,
+                    numero = e.endNum,
+                    bairro = e.bairro,
+                    cep = e.cep,
+                    cidade = e.cidade,
+                    uf = e.uf,
+                    pais = e.pais,
+                    idxCliente = e.idxTabela,
+                })
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+        
+        var totalRecords = enderecos.Count;
+        
+        return new PagedResponse<EnderecoCliente>{
+            Data = enderecos,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalRecords = totalRecords,
+            TotalPages = (int) Math.Ceiling(totalRecords / (double)pageSize)
+        };
     }
 
     public async Task<PagedResponse<CasaEvento>> GetCasaEvento(QueryFilter filter, CancellationToken cancellationToken = default)

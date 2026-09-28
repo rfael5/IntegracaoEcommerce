@@ -116,7 +116,7 @@ public class CadastroPedido
         return novoEventoOrc;
     }
 
-    public async Task<TpaDoctopedDTO> CadastrarDoctoped(DoctopedAtendimento doctoped, string? _idxDoctoEvento = null)
+    public async Task<TpaDoctopedDTO> CadastrarDoctoped(DoctopedAtendimento doctoped, string idEndereco, string? _idxDoctoEvento)
     {
         var numeroDocumento = await CriarNumeroDocumentoOR(doctoped.tpDocto);
         var novaOR = new TpaDoctopedDTO()
@@ -156,6 +156,7 @@ public class CadastroPedido
             opInc = doctoped.opInc,
             opAlt = doctoped.opAlt,
             entregar = doctoped.entregar,
+            idxEnderecoObra = idEndereco,
             idxDoctoEvento = _idxDoctoEvento == null ? "" : _idxDoctoEvento,
             contato = doctoped.contato,
             telefone = doctoped.telefone,
@@ -244,12 +245,35 @@ public class CadastroPedido
         return novoOrcPed;
     }
 
+    public async Task<string> ObterOuCadastrarEndereco(string idUsuario, string? idxEnderecoObra, DadosEntrega? dadosEntrega)
+    {
+        switch(idxEnderecoObra)
+        {
+            case null:
+                if(dadosEntrega == null)
+                {
+                    throw new ArgumentException("Dados de entrega obrigatórios");
+                }
+                var pkEndereco = await _usuariosService.CadastrarEnderecoUsuario(idUsuario, dadosEntrega);
+                return pkEndereco;
+            default:
+                var endereco = await _context.Enderecos
+                    .Where(e => e.pkEndereco.Trim() == idxEnderecoObra.Trim()).SingleOrDefaultAsync() ?? throw new Exception("Endereço não identificado");
+                return endereco.pkEndereco;
+        }
+    }
+
     public async Task<int> CadastrarNovaEc(InformacoesEC informacoesEc)
     {
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
-            var doctoped = await CadastrarDoctoped(informacoesEc.doctopedAtendimento);
+            var idEndereco = await ObterOuCadastrarEndereco(
+                informacoesEc.doctopedAtendimento.idxEntidade, 
+                informacoesEc.doctopedAtendimento.idxEnderecoObra, 
+                informacoesEc.enderecoEC
+            );
+            var doctoped = await CadastrarDoctoped(informacoesEc.doctopedAtendimento, idEndereco, null);
             var sequenciaMovtoped = 1;
             foreach (var produto in informacoesEc.movtopedAtendimento)
             {
@@ -279,7 +303,7 @@ public class CadastroPedido
         try
         {
             var eventoOrc = await CadastrarEventoOrc(informacoesOr.eventoOrcAtendimento);
-            var doctoped = await CadastrarDoctoped(informacoesOr.doctopedAtendimento, eventoOrc.pkEventoOrc);
+            var doctoped = await CadastrarDoctoped(informacoesOr.doctopedAtendimento, "".PadLeft(12), eventoOrc.pkEventoOrc);
             // foreach(var produto in informacoesOr.movtopedAtendimento)
             // {
             //     var movtoped = await CadastrarMovtopedOR(produto, doctoped.pkDoctoped);
@@ -475,8 +499,6 @@ public class CadastroPedido
     //             .Select((d) => new { d.pkDoctoped, d.documento, d.idxEntidade, d.idxTabela, d.idxTabelaSub, d.totalDocto })
     //             .SingleAsync();
 
-
-
     //         var contrato = await CriarContrato(doctoped, operador);
     //         int pkContrato = (int)contrato.pkContrato;
     //         DateTime dataCriacaoContrato = (DateTime)contrato.dtInc;
@@ -593,7 +615,7 @@ public class CadastroPedido
         try
         {
             var eventoOrc = await CadastrarEventoOrc(informacoesOr.eventoOrcAtendimento);
-            var doctoped = await CadastrarDoctoped(informacoesOr.doctopedAtendimento, eventoOrc.pkEventoOrc);
+            var doctoped = await CadastrarDoctoped(informacoesOr.doctopedAtendimento, "".PadLeft(12), eventoOrc.pkEventoOrc);
             // foreach(var produto in informacoesOr.movtopedAtendimento)
             // {
             //     var movtoped = await CadastrarMovtopedOR(produto, doctoped.pkDoctoped);

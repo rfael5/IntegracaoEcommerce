@@ -71,6 +71,8 @@ public record DoctopedAtendimento
     public int opAlt { get; init; } // Id do usuário no TPA.
     [Column("ENTREGAR")] 
     public required string entregar { get; init; } //OR sempre letra E. EC, se for entrega = 3, se for retirar na loja = 1
+    [Column("IDX_ENDERECOOBRA")]
+    public required string? idxEnderecoObra { get; init; }  
     [Column("IDX_DOCTOEVENTO")]
     public string idxDoctoEvento { get; init; } // ID da tabela TPAEVENTOORC com informações do evento. Ela também tem que ser criada antes dessa.
     [Column("CONTATO")]
