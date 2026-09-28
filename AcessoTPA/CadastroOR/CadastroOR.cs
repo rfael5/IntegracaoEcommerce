@@ -129,7 +129,7 @@ public class CadastroPedido
             cnpjCpf = doctoped.cnpjCpf,
             cidade = doctoped.cidade,
             uf = doctoped.uf,
-            idxDepto = doctoped.idxDepto,
+            idxDepto = doctoped.idxDepto.PadLeft(12),
             idxTabela = doctoped.idxTabela?.PadLeft(12),
             idxTabelaSub = doctoped.idxTabelaSub?.PadLeft(12),
             idxFormaPag = doctoped.idxFormaPag?.PadLeft(12),
