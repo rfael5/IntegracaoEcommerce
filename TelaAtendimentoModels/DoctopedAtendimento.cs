@@ -72,7 +72,7 @@ public record DoctopedAtendimento
     [Column("ENTREGAR")] 
     public required string entregar { get; init; } //OR sempre letra E. EC, se for entrega = 3, se for retirar na loja = 1
     [Column("IDX_ENDERECOOBRA")]
-    public required string? idxEnderecoObra { get; init; }  
+    public string? idxEnderecoObra { get; init; }  
     [Column("IDX_DOCTOEVENTO")]
     public string idxDoctoEvento { get; init; } // ID da tabela TPAEVENTOORC com informações do evento. Ela também tem que ser criada antes dessa.
     [Column("CONTATO")]
