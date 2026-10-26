@@ -89,8 +89,7 @@ public class AcessoTPA
             FETCH NEXT @pageSize ROWS ONLY
         ";
 
-
-        var Materiais= await _context.ServicosMateriais
+        var Materiais = await _context.ServicosMateriais
             .FromSqlRaw(_query, 
                 new SqlParameter("@offset", offset), 
                 new SqlParameter("@pageSize", pageSize)).AsNoTracking().ToListAsync(cancellationToken);
